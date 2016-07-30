@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import edu.stanford.nlp.util.Pair;
-
+import pipeline.CompositeDoc;
 import shared.datatypes.FeatureType;
 import shared.datatypes.ItemFeature;
 
@@ -21,8 +21,8 @@ public class CompositeDocNLPProcess {
 	}
 	
 	public void Process(CompositeDoc compositeDoc) {
-		//NLPParserProcess(compositeDoc);
-		NLPNERProcess(compositeDoc);
+		NLPParserProcess(compositeDoc);
+		//NLPNERProcess(compositeDoc);
 	}
 	
 	private void NLPParserProcess(CompositeDoc compositeDoc) {
@@ -37,6 +37,16 @@ public class CompositeDocNLPProcess {
 		if (compositeDoc.short_desc != null && !compositeDoc.short_desc.isEmpty()) {
 			srparser.ParagraphPhraseParse(compositeDoc.short_desc, 1, np_hashmap, nnp_hashmap, vb_hashmap);
 		}
+		// write to the composteDoc
+		compositeDoc.title_np = new ArrayList<String>();
+		for (Entry<String, MatchType> entry : np_hashmap.entrySet()) {
+			compositeDoc.title_np.add(entry.getKey());
+		}
+		compositeDoc.title_nnp = new ArrayList<String>();
+		for (Entry<String, MatchType> entry : nnp_hashmap.entrySet()) {
+			compositeDoc.title_nnp.add(entry.getKey());
+		}
+		
 		int idx = 1;
 		if (compositeDoc.main_text_list != null) {
 			for (String body_paragraph : compositeDoc.main_text_list) {
@@ -44,7 +54,6 @@ public class CompositeDocNLPProcess {
 				idx = idx + 1;
 			}
 		}
-		
 		
 		ArrayList<Pair<String, Double>> weight = new ArrayList<Pair<String, Double>>();
 		ElementWeightCalculate(np_hashmap, weight, compositeDoc.title_np, compositeDoc.body_np);
@@ -109,6 +118,19 @@ public class CompositeDocNLPProcess {
 		if (compositeDoc.short_desc != null && !compositeDoc.short_desc.isEmpty()) {
 			nl.GetEntity(compositeDoc.short_desc, 1, entitys_people, entitys_location, entitys_organization);
 		}
+		// write the NER to compositeDoc
+		compositeDoc.title_NER_person = new ArrayList<String>();
+		for (Entry<String, MatchType> entry : entitys_people.entrySet()) {
+			compositeDoc.title_NER_person.add(entry.getKey());
+		}
+		compositeDoc.title_NER_location = new ArrayList<String>();
+		for (Entry<String, MatchType> entry : entitys_location.entrySet()) {
+			compositeDoc.title_NER_location.add(entry.getKey());
+		}
+		compositeDoc.title_NER_organization = new ArrayList<String>();
+		for (Entry<String, MatchType> entry : entitys_organization.entrySet()) {
+			compositeDoc.title_NER_organization.add(entry.getKey());
+		}		
 		int idx = 1;
 		if (compositeDoc.main_text_list != null) {
 			for (String body_paragraph : compositeDoc.main_text_list) {

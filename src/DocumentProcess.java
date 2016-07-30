@@ -24,7 +24,10 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TMemoryBuffer;
 //import org.apache.commons.cli.Options;
 
+import DocProcessClassification.DataAdapter.ClassifierInputAllNLPAdapter;
+import DocProcessClassification.DataAdapter.ClassifierInputTarget;
 import leso.media.ImageTextDoc;
+import pipeline.CompositeDoc;
 
 // this maprecude program is based on hadoop 2.6, the low version is not supported
 public class DocumentProcess {
@@ -75,11 +78,24 @@ public class DocumentProcess {
 		    } catch(Exception e) {
 		    	context.getCounter("custom", "deserial exception").increment(1);
 		    }
+		    
+		    if (false) {
+		    	textProcess.Process(compositeDoc);
+		    	nlpProcess.Process(compositeDoc);
+		    	ClassifierInputTarget inputAdapter = new ClassifierInputAllNLPAdapter();
+		    	String res = inputAdapter.GetInputText(compositeDoc);
+		    }
 
 		    // document process logic
+		    //double t1 = System.currentTimeMillis();
+		    //textProcess.Process(compositeDoc);
+		    //double t2 = System.currentTimeMillis();
 		    textProcess.Process(compositeDoc);
-		    nlpProcess.Process(compositeDoc);
+		    //double t3 = System.currentTimeMillis();
+		    //System.out.println((t2 - t1) + " time " + (t3 - t2));
+		    //nlpProcess.Process(compositeDoc);
 
+		    
 		    
 		    // serialize the thrift
 		    TMemoryBuffer mb;
@@ -109,6 +125,10 @@ public class DocumentProcess {
     public static void main(String[] args) throws Exception
     {
     	Configuration conf = new Configuration();
+    	
+    	conf.set("type", "classifier_data");
+    	conf.set("mapreduce.map.java.opts", "-Xmx4608m");
+    	
     	/*String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
     	if (otherArgs.length != 2) {
     		System.err.println("Usage: wordcount <in> <out>");
@@ -118,7 +138,7 @@ public class DocumentProcess {
         for (int i = 0; i < libjarsArr.length; ++i) {
         	addTmpJar(libjarsArr[i], conf);
         }
-    	Job job = new Job(conf, "word count");
+    	Job job = new Job(conf, "Stanford NLP process");
     	job.setJarByClass(DocumentProcess.class);
     	job.setMapperClass(Map.class);
     	job.setCombinerClass(Reduce.class);
