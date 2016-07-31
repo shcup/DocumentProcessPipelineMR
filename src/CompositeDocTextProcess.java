@@ -26,6 +26,8 @@ import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.process.Tokenizer;
 import edu.stanford.nlp.process.TokenizerFactory;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
 import pipeline.CompositeDoc;
 
@@ -42,7 +44,10 @@ public class CompositeDocTextProcess implements IDocProcessor {
         // (required for lemmatization), and lemmatization
         Properties props;
         props = new Properties();
-        props.put("annotators", "tokenize, ssplit, pos, lemma, ner");
+        //props.put("annotators", "tokenize, ssplit, pos, lemma, ner");
+        props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse");
+        props.setProperty("parse.model", "edu/stanford/nlp/models/srparser/englishSR.ser.gz");
+
 
         // StanfordCoreNLP loads a lot of models, so you probably
         // only want to do this once per execution
@@ -117,7 +122,9 @@ public class CompositeDocTextProcess implements IDocProcessor {
                 // Retrieve and add the lemma for each word into the list of lemmas
             	String word = token.get(LemmaAnnotation.class);
             	String ne = token.get(NamedEntityTagAnnotation.class);
-            	ner.add(ne);
+            	if (ne == "PERSON" || ne == "LOCATION" || ne == "ORGANIZATION" || ne == "MISC") {
+            		ner.add(ne);
+            	}
             	if (!stopword.IsStopWord(word)) {
             		lemmas.add(word);
             	}
@@ -127,7 +134,10 @@ public class CompositeDocTextProcess implements IDocProcessor {
                 }
                 preWord = word;
             }
+            // this is the parse tree of the current sentence
+            Tree tree = sentence.get(TreeAnnotation.class);
         }
+        
 
 	}
 	

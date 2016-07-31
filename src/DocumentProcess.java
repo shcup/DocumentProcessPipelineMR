@@ -45,7 +45,7 @@ public class DocumentProcess {
 			System.out.println("begin to setup function!");
 			try {
 				textProcess = new CompositeDocTextProcess();
-				nlpProcess = new CompositeDocNLPProcess();
+				//nlpProcess = new CompositeDocNLPProcess();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -127,6 +127,7 @@ public class DocumentProcess {
     	Configuration conf = new Configuration();
     	
     	conf.set("type", "classifier_data");
+    	conf.set("mapreduce.map.memory.mb", "5000");
     	conf.set("mapreduce.map.java.opts", "-Xmx4608m");
     	
     	/*String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
