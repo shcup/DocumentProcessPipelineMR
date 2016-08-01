@@ -107,7 +107,6 @@ public class CompositeDocNLPProcess {
 		}
 	}
 
-
 	private void NLPNERProcess(CompositeDoc compositeDoc) {
 		List<Object> ner = new ArrayList<Object>();
 		HashMap<String, MatchType> entitys_people = new HashMap<String, MatchType>();

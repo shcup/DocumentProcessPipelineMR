@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import DocProcess.IDocProcessor;
 import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
@@ -29,7 +31,10 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.util.Pair;
 import pipeline.CompositeDoc;
+import shared.datatypes.FeatureType;
+import shared.datatypes.ItemFeature;
 
 public class CompositeDocTextProcess implements IDocProcessor {
 
@@ -62,13 +67,28 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		compositeDoc.title_ner = new ArrayList<String>();
 		compositeDoc.body_ner = new ArrayList<String>();
 		
-		GetWords2GramFromText(compositeDoc.title, compositeDoc.title_words, compositeDoc.title_2grams, compositeDoc.title_ner);
+		compositeDoc.feature_list = new ArrayList<ItemFeature>();
+		
+		HashMap<String, MatchType> np_hashmap = new HashMap<String, MatchType>(); 
+		HashMap<String, MatchType> nnp_hashmap = new HashMap<String, MatchType>(); 
+		HashMap<String, MatchType> vb_hashmap = new HashMap<String, MatchType>();
+		
+		GetWords2GramFromText(compositeDoc.title, compositeDoc.title_words, compositeDoc.title_2grams, compositeDoc.title_ner, 0, np_hashmap, nnp_hashmap, vb_hashmap);
 		if (compositeDoc.short_desc != null && !compositeDoc.short_desc.isEmpty()) {
-			GetWords2GramFromText(compositeDoc.short_desc, compositeDoc.body_words, compositeDoc.body_2grams, compositeDoc.title_ner);
+			GetWords2GramFromText(compositeDoc.short_desc, compositeDoc.body_words, compositeDoc.body_2grams, compositeDoc.title_ner, 0, np_hashmap, nnp_hashmap, vb_hashmap);
+		}
+		// write to the composteDoc
+		compositeDoc.title_np = new ArrayList<String>();
+		for (Entry<String, MatchType> entry : np_hashmap.entrySet()) {
+			compositeDoc.title_np.add(entry.getKey());
+		}
+		compositeDoc.title_nnp = new ArrayList<String>();
+		for (Entry<String, MatchType> entry : nnp_hashmap.entrySet()) {
+			compositeDoc.title_nnp.add(entry.getKey());
 		}
 		if (compositeDoc.main_text_list != null) {
 			for (String text : compositeDoc.main_text_list) {
-				GetWords2GramFromText(text, compositeDoc.body_words, compositeDoc.body_2grams, compositeDoc.body_ner);
+				GetWords2GramFromText(text, compositeDoc.body_words, compositeDoc.body_2grams, compositeDoc.body_ner, 0, np_hashmap, nnp_hashmap, vb_hashmap);
 			}
 		}
 	}
@@ -102,7 +122,14 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		}
 	}
 	
-	private void GetWords2GramFromText(String documentText, List<String> lemmas, List<String> two_grams, List<String> ner) {
+	private void GetWords2GramFromText(String documentText, 
+									   List<String> lemmas, 
+									   List<String> two_grams, 
+									   List<String> ner,
+									   int paragraph_idx,
+									   HashMap<String, MatchType> np_hashmap, 
+									   HashMap<String, MatchType> nnp_hashmap, 
+									   HashMap<String, MatchType> vb_hashmap) {
 		if (documentText == null || documentText.isEmpty()) {
 			return;
 		}
@@ -115,6 +142,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
 
         // Iterate over all of the sentences found
         List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+        int idx = 0;
         for(CoreMap sentence: sentences) {
             // Iterate over all tokens in a sentence
         	String preWord = null;
@@ -136,6 +164,38 @@ public class CompositeDocTextProcess implements IDocProcessor {
             }
             // this is the parse tree of the current sentence
             Tree tree = sentence.get(TreeAnnotation.class);
+  	      	ArrayList<String> np_array = new ArrayList<String>();
+  	      	ArrayList<String> nnp_array = new ArrayList<String>();
+  	      	ArrayList<String> vb_array = new ArrayList<String>();
+  	      	SentencePhraseParse(tree, np_array, nnp_array, vb_array);
+  	      	
+	  	      for (String np : np_array) {
+		    	  if (np_hashmap.containsKey(np)) {
+		    		  np_hashmap.get(np).match.add(new Pair(paragraph_idx, idx));
+		    	  } else {
+		    		  np_hashmap.put(np, new MatchType());
+		    		  np_hashmap.get(np).match.add(new Pair(paragraph_idx, idx));
+		    	  }
+		      }
+		      
+		      for (String nnp : nnp_array) {
+		    	  if (nnp_hashmap.containsKey(nnp)) {
+		    		  nnp_hashmap.get(nnp).match.add(new Pair(paragraph_idx, idx));
+		    	  } else {
+		    		  nnp_hashmap.put(nnp, new MatchType());
+		    		  nnp_hashmap.get(nnp).match.add(new Pair(paragraph_idx, idx));
+		    	  }
+		      }
+		      
+		      for (String vb : vb_array) {
+		    	  if (vb_hashmap.containsKey(vb)) {
+		    		  vb_hashmap.get(vb).match.add(new Pair(paragraph_idx, idx));
+		    	  } else {
+		    		  vb_hashmap.put(vb, new MatchType());
+		    		  vb_hashmap.get(vb).match.add(new Pair(paragraph_idx, idx));
+		    	  }
+		      }
+		      idx++;
         }
         
 
@@ -182,4 +242,153 @@ public class CompositeDocTextProcess implements IDocProcessor {
 			}
 		}
 	}
+	
+    private static String NP = "NP";
+    private static String NNP = "NNP";
+    private static String VBZ = "VBZ";
+    private static String VBN = "VBN";
+    private static String VBG = "VBG";
+    private static String VB = "VB";
+    
+    private void SentencePhraseParse(Tree tree, ArrayList<String> np, ArrayList<String> nnp, ArrayList<String> vb) {
+    	//ArrayList<Pair<String, Integer>> res = new ArrayList<Pair<String, Integer>>();
+    	
+    	if (tree.label().value().equals(NP)) {
+    		ArrayList<Pair<ArrayList<String>, Boolean>>  words = new ArrayList<Pair<ArrayList<String>, Boolean>>();
+    		words.add(new Pair(new ArrayList<String>(), false));
+    		GenerateNP(tree, words, vb);
+    		ConvertWordsToString(words, np, nnp);
+    		return ;
+    	}
+    	
+    	if (tree.label().value().equals(VBZ) || tree.label().value().equals(VBN) || 
+    			tree.label().value().equals(VBG) || tree.label().value().equals(VB)) {
+    		if (!tree.isLeaf() && tree.getChild(0).label() != null) {
+    			vb.add(tree.getChild(0).label().value().toString());
+    		}
+    	}
+    	
+    	Tree[] kids = tree.children();
+    	if (kids != null) {
+    		for (Tree kid : kids) {
+    			SentencePhraseParse(kid, np, nnp, vb);
+    		}
+    	}
+    	
+     	return;
+    }
+    
+    // if in NP there are some other sub NP, it will only generate the words for lowest NP
+    // and also it will seperate the NP and NNP
+    private void GenerateNP(Tree tree, ArrayList<Pair<ArrayList<String>, Boolean>> words, ArrayList<String> vb) {
+    	if (tree.isLeaf()) {
+    		if (tree.label() != null) {
+    			words.get(words.size() - 1).first.add(tree.label().value());
+    		}
+    		return;
+    	}
+    	
+    	if (tree.label().value().equals(NP)) {
+    		words.get(words.size() - 1).first.clear();
+    		words.get(words.size() - 1).second = false;
+    	}
+    	
+    	if (tree.label().value().equals(NNP)) {
+    		words.get(words.size() - 1).second = true;
+    	}
+    	
+    	if (tree.label().value().equals(VBZ) || tree.label().value().equals(VBN) || 
+    			tree.label().value().equals(VBG) || tree.label().value().equals(VB)) {
+    		if (!tree.isLeaf() && tree.getChild(0).label() != null) {
+    			vb.add(tree.getChild(0).label().value().toString());
+    		}
+    	}
+    	
+    	Tree[] kids = tree.children();
+    	if (kids != null) {
+    		for (Tree kid : kids) {
+    			GenerateNP(kid, words, vb);
+    		}
+    	}
+    	
+    	if (tree.label().value().equals(NP)) {
+    		words.add(new Pair(new ArrayList<String>(), false));
+    	}
+    }
+    
+    private void ConvertWordsToString(ArrayList<Pair<ArrayList<String>, Boolean>> words, ArrayList<String> np, ArrayList<String> nnp) {
+    	for (Pair<ArrayList<String>, Boolean> arraylist : words) {
+    		if (arraylist.first.size() != 0) {
+		    	StringBuilder sb = new StringBuilder();
+		    	boolean has_charactor = false;
+		    	for (int i = 0; i < arraylist.first.size(); ++i) {
+		    		sb.append(arraylist.first.get(i));
+		    		if (i != arraylist.first.size() - 1) {
+		    			sb.append(" ");
+		    		}
+		    	}
+		    	String phrase = sb.toString();
+		    	if (phrase.length() == 1 && !Character.isLetter(phrase.charAt(0))) {
+		    		continue;
+		    	}
+		    	if (arraylist.second == true) {
+		    		nnp.add(phrase);
+		    	} else {
+		    		np.add(phrase);
+		    	}
+    		}
+    	}
+    }
+    
+	
+	private void ElementWeightCalculate(HashMap<String, MatchType> hashmap, ArrayList<Pair<String, Double>> weight, List<String>  title, List<String> body) {
+
+		for (Entry<String, MatchType> item : hashmap.entrySet()) {
+			double feature_score = 0.0f;
+			boolean intitle = false;
+			boolean inbody = false;
+			for (Pair<Integer, Integer> pair : item.getValue().match) {
+				if (pair.first == 0) {
+					feature_score = feature_score + 2.0f;
+					intitle = true;
+				} else {
+					feature_score = feature_score + (1.0f/pair.first) * (1.0f/Math.sqrt(pair.second)); // also should consider the idf
+					inbody = true;
+				}
+			}
+			if (intitle == true && title != null) {
+				title.add(item.getKey().toLowerCase());
+			}
+			if (inbody == true && body != null) {
+				body.add(item.getKey().toLowerCase());
+			}
+			weight.add(new Pair(item.getKey(), feature_score));
+		}
+		
+
+		
+		// normalize
+		double max = -1.0f;
+		for (Pair<String, Double> pair : weight) {
+			if (pair.second > max) {
+				max = pair.second;
+			}
+		}
+
+		for (Pair<String, Double> pair : weight) {
+			pair.second = pair.second / max;
+		}
+	}
+	
+	private void AddWeight2CompositeDoc(ArrayList<Pair<String, Double>> weight, CompositeDoc compositeDoc, FeatureType feature_type) {
+		for (Pair<String, Double> pair : weight) {
+			ItemFeature item_feature = new ItemFeature();
+			item_feature.name = pair.first.toLowerCase();
+			item_feature.weight = (short) (pair.second * 1000);
+			item_feature.type = feature_type;
+			compositeDoc.feature_list.add(item_feature);
+		}
+	}
+    
+    
 }
