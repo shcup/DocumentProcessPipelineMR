@@ -52,6 +52,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
         //props.put("annotators", "tokenize, ssplit, pos, lemma, ner");
         props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse");
         props.setProperty("parse.model", "edu/stanford/nlp/models/srparser/englishSR.ser.gz");
+        props.setProperty("ner.model", "edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz");
 
 
         // StanfordCoreNLP loads a lot of models, so you probably
@@ -91,6 +92,18 @@ public class CompositeDocTextProcess implements IDocProcessor {
 				GetWords2GramFromText(text, compositeDoc.body_words, compositeDoc.body_2grams, compositeDoc.body_ner, 0, np_hashmap, nnp_hashmap, vb_hashmap);
 			}
 		}
+		
+		ArrayList<Pair<String, Double>> weight = new ArrayList<Pair<String, Double>>();
+		ElementWeightCalculate(np_hashmap, weight, compositeDoc.title_np, compositeDoc.body_np);
+		AddWeight2CompositeDoc(weight, compositeDoc, shared.datatypes.FeatureType.NP);
+		
+		weight.clear();
+		ElementWeightCalculate(nnp_hashmap, weight, compositeDoc.title_nnp, compositeDoc.body_nnp);
+		AddWeight2CompositeDoc(weight, compositeDoc, shared.datatypes.FeatureType.NNP);
+		
+		weight.clear();
+		ElementWeightCalculate(vb_hashmap, weight, null, null);
+		AddWeight2CompositeDoc(weight, compositeDoc, shared.datatypes.FeatureType.VB);
 	}
 	
 	public void Process1(CompositeDoc compositeDoc) {
@@ -122,7 +135,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		}
 	}
 	
-	private void GetWords2GramFromText(String documentText, 
+	public void GetWords2GramFromText(String documentText, 
 									   List<String> lemmas, 
 									   List<String> two_grams, 
 									   List<String> ner,
@@ -146,18 +159,27 @@ public class CompositeDocTextProcess implements IDocProcessor {
         for(CoreMap sentence: sentences) {
             // Iterate over all tokens in a sentence
         	String preWord = null;
+        	String preNer = null;
             for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
                 // Retrieve and add the lemma for each word into the list of lemmas
-            	String word = token.get(LemmaAnnotation.class);
+            	String word = token.get(LemmaAnnotation.class).toLowerCase();
             	String ne = token.get(NamedEntityTagAnnotation.class);
-            	if (ne == "PERSON" || ne == "LOCATION" || ne == "ORGANIZATION" || ne == "MISC") {
-            		ner.add(ne);
+            	if (ne.equals("PERSON") || ne.equals("LOCATION") || ne.equals("ORGANIZATION")) {
+            		if (preNer != null && 
+            				ner.size() > 0 && 
+            				preNer.equals(ner) && 
+            				(preNer.equals("PERSON") || preNer.equals("LOCATION") || ne.equals("ORGANIZATION"))) {
+            			ner.set(ner.size() - 1, ner.get(ner.size() - 1) + " " + word);
+            		} else {
+            			ner.add(word);
+            		}
             	}
+            	preNer = ne;
             	if (!stopword.IsStopWord(word)) {
             		lemmas.add(word);
             	}
                 
-                if (preWord != null) {
+                if (preWord != null && IsWord(word) && IsWord(preWord)) {
                 	two_grams.add(preWord + "_" + word);
                 }
                 preWord = word;
@@ -245,6 +267,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
 	
     private static String NP = "NP";
     private static String NNP = "NNP";
+    private static String NNPS = "NNPS";
     private static String VBZ = "VBZ";
     private static String VBN = "VBN";
     private static String VBG = "VBG";
@@ -293,7 +316,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
     		words.get(words.size() - 1).second = false;
     	}
     	
-    	if (tree.label().value().equals(NNP)) {
+    	if (tree.label().value().equals(NNP) || tree.label().value().equals(NNPS)) {
     		words.get(words.size() - 1).second = true;
     	}
     	
@@ -389,6 +412,49 @@ public class CompositeDocTextProcess implements IDocProcessor {
 			compositeDoc.feature_list.add(item_feature);
 		}
 	}
+	
+	private boolean IsWord(String word) {
+		if (word.equals("'s")) {
+			return false;
+		}
+		
+		for (int i = 0 ; i < word.length(); ++i) {
+			if (Character.isLetterOrDigit(word.charAt(i))) {
+				return true;
+			}
+		}
+		
+		return  false;
+	}
     
-    
+    public static void main(String[] args) throws Exception 
+    {
+    	CompositeDocTextProcess textProcess = new CompositeDocTextProcess();
+    	while (true) {
+    		ArrayList<String> lemmas = new  ArrayList<String>();
+    		ArrayList<String> two_grams = new  ArrayList<String>();
+    		ArrayList<String> ner = new  ArrayList<String>();
+    		HashMap<String, MatchType> np_hashmap = new HashMap<String, MatchType>(); 
+    		HashMap<String, MatchType> nnp_hashmap = new HashMap<String, MatchType>(); 
+    		HashMap<String, MatchType> vb_hashmap = new HashMap<String, MatchType>();
+    		String text = "Euro 2016 Final: Yuvraj Singh, Chris Gayle, others celebrate Portugal's victory";
+    		
+    		textProcess.GetWords2GramFromText(text, lemmas, two_grams, ner, 0, np_hashmap, nnp_hashmap, vb_hashmap);;
+    		
+    		for (String word : lemmas) {
+    			System.out.print(word + ",");
+    		}
+    		System.out.println();
+    		
+    		for (String word : two_grams) {
+    			System.out.print(word + ",");
+    		}
+    		System.out.println();
+    		
+    		for (String word : ner) {
+    			System.out.print(word + ",");
+    		}
+    		System.out.println();
+    	}
+    }
 }

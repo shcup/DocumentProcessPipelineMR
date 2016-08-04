@@ -18,6 +18,7 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
@@ -32,27 +33,22 @@ import DocProcessClassification.DataAdapter.ClassifierInputTarget;
 import leso.media.ImageTextDoc;
 import pipeline.CompositeDoc;
 
-// this maprecude program is based on hadoop 2.6, the low version is not supported
-public class DocumentProcess {
 
-	
+public class IDFMapReduce {
+
     public static class Map extends  Mapper<Object, Text, Text, Text>
     {
-
-		private final static IntWritable one = new IntWritable(1);
-		private Text word = new Text();
-		private CompositeDocTextProcess textProcess;
-		private CompositeDocNLPProcess nlpProcess;
+		//private CompositeDocTextProcess textProcess;
 		
 		public void setup(org.apache.hadoop.mapreduce.Mapper.Context context) throws IOException, InterruptedException {
-			System.out.println("begin to setup function!");
+			/*System.out.println("begin to setup function!");
 			try {
 				textProcess = new CompositeDocTextProcess();
 				//nlpProcess = new CompositeDocNLPProcess();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}	
+			}	*/
 		}
 
 		public void map(Object key, Text value, Context context)
@@ -68,62 +64,44 @@ public class DocumentProcess {
 		    
 		    CompositeDoc compositeDoc = CompositeDocSerialize.DeSerialize(segments[1], context);
 		    
-		    textProcess.Process(compositeDoc);
-		    if (false) {
-		    	ClassifierInputTarget inputAdapter = new ClassifierInputAllNLPAdapter();
-		    	String res = inputAdapter.GetInputText(compositeDoc);
-		    	return;
-		    } 
-		    
-		    if (true) {
-		    	IDFGenerator idfGenerator = new IDFGenerator();
-		    	HashSet items = idfGenerator.GetItemList(compositeDoc);
-		    	for (Iterator it = items.iterator(); it.hasNext();) {
-		    		context.write(new Text(segments[0]), new Text((String)(it.next())));
-		    	}
-		    	return ;
-		    }
-
-		    
-		    context.write(new Text(segments[0]), new Text(CompositeDocSerialize.Serialize(compositeDoc, context)));
-
+	    	IDFGenerator idfGenerator = new IDFGenerator();
+	    	HashSet items = idfGenerator.GetItemList(compositeDoc);
+	    	for (Iterator it = items.iterator(); it.hasNext();) {
+	    		context.write(new Text((String)(it.next())), new Text(segments[0]));
+	    	}
 		}
     }
-	public static class Reduce extends Reducer<Text, Text, Text, Text>
+    
+	public static class Reduce extends Reducer<Text, Text, Text, IntWritable>
 	{
 		public void reduce(Text key, Iterable<Text> values,Context context)
 				throws IOException, InterruptedException
 		{
+			HashSet<String> count = new HashSet<String>();
 			for (Text text : values) {
-				context.write(key, text);
+				count.add(text.toString());
 			}
+			context.write(key, new IntWritable(count.size()));
 		}
 	}
+	
     public static void main(String[] args) throws Exception
     {
     	Configuration conf = new Configuration();
     	
-    	conf.set("type", "classifier_data");
-    	conf.set("mapreduce.map.memory.mb", "5000");
-    	conf.set("mapreduce.map.java.opts", "-Xmx4608m");
-    	
-    	/*String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-    	if (otherArgs.length != 2) {
-    		System.err.println("Usage: wordcount <in> <out>");
-    		System.exit(2);
-    	}*/
         String[] libjarsArr = args[2].split(",");
         for (int i = 0; i < libjarsArr.length; ++i) {
         	addTmpJar(libjarsArr[i], conf);
         }
-    	Job job = new Job(conf, "Stanford NLP process");
-    	job.setJarByClass(DocumentProcess.class);
+    	
+    	Job job = new Job(conf, "IDF Mapreduce");
+    	job.setJarByClass(IDFMapReduce.class);
     	job.setMapperClass(Map.class);
     	job.setCombinerClass(Reduce.class);
     	job.setReducerClass(Reduce.class);
-    	job.setNumReduceTasks(0);
+    	job.setNumReduceTasks(30);
     	job.setOutputKeyClass(Text.class);
-    	job.setOutputValueClass(Text.class);
+    	job.setOutputValueClass(IntWritable.class);
 
     	
     	FileInputFormat.addInputPath(job, new Path(args[0]));
@@ -133,14 +111,6 @@ public class DocumentProcess {
 
     }
     
-	/**
-	 * 为Mapreduce添加第三方jar包
-	 * 
-	 * @param jarPath
-	 *            举例：D:/Java/new_java_workspace/scm/lib/guava-r08.jar
-	 * @param conf
-	 * @throws IOException
-	 */
 	public static void addTmpJar(String jarPath, Configuration conf) throws IOException {
 		System.setProperty("path.separator", ":");
 		FileSystem fs = FileSystem.getLocal(conf);
@@ -152,5 +122,5 @@ public class DocumentProcess {
 			conf.set("tmpjars", tmpjars + "," + newJarPath);
 		}
 	}
-
+	
 }
