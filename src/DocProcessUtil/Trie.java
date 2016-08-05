@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
@@ -136,6 +137,7 @@ public class Trie {
 		} else {
 			nodes = new ArrayList<TrieNode> ();
 		}
+		nodes.add(new TrieNode());
 
 		
 		BufferedReader br=new BufferedReader(new FileReader(file));
@@ -147,6 +149,38 @@ public class Trie {
         	}
         	AddOneString(items[0], items[1]);
         }
+	}
+	
+	public void Load(InputStream input) throws IOException {
+		if (nodes != null) {
+			nodes.clear();
+		} else {
+			nodes = new ArrayList<TrieNode> ();
+		}
+		nodes.add(new TrieNode());
+
+		BufferedReader br=new BufferedReader(new InputStreamReader(input));
+        String line;
+        while((line=br.readLine())!=null) {
+        	String[] items = line.split("\t");
+        	if (items.length != 2) {
+        		System.exit(-1);
+        	}
+        	AddOneString(items[0], items[1]);
+        }	
+	}
+	
+	public static void main(String[] args) throws Exception{
+
+		Trie patterns = new Trie();
+			String file="src\\pattern.txt";
+			String url="http://indianexpress.com/article/world/world-news/world-news-mummy-sailor-found-off-philippines/";
+			System.out.println(url+"***"+file);
+			
+			patterns.URLPreProcess(url);		
+			patterns.Load(file );
+			String classify=patterns.FindFirstMatch(url); 
+			System.out.print(patterns.URLPreProcess(url)+"***category***"+classify);
 	}
 	
 }

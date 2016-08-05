@@ -1,60 +1,53 @@
-
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.StringTokenizer;
+import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.codec.binary.Base64;
-
-import java.io.IOException;
-import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.GenericOptionsParser;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.transport.TMemoryBuffer;
-//import org.apache.commons.cli.Options;
 
 import DocProcess.CompositeDocSerialize;
 import DocProcess.IDF.IDFGenerator;
 import DocProcessClassification.DataAdapter.ClassifierInputAllNLPAdapter;
 import DocProcessClassification.DataAdapter.ClassifierInputTarget;
-import leso.media.ImageTextDoc;
+import DocProcessClassification.PatternMatch.URLPrefixPatternMatch;
 import pipeline.CompositeDoc;
 
-// this maprecude program is based on hadoop 2.6, the low version is not supported
-public class DocumentProcess {
-
-	
+public class ClassificationTrainingDataMapReduce {
     public static class Map extends  Mapper<Object, Text, Text, Text>
     {
-
-		private final static IntWritable one = new IntWritable(1);
-		private Text word = new Text();
-		private CompositeDocTextProcess textProcess;
-		private CompositeDocNLPProcess nlpProcess;
-		
-		public void setup(org.apache.hadoop.mapreduce.Mapper.Context context) throws IOException, InterruptedException {
-			System.out.println("begin to setup function!");
-			try {
-				textProcess = new CompositeDocTextProcess();
-				//nlpProcess = new CompositeDocNLPProcess();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
-		}
-
+    	URLPrefixPatternMatch prefixMatch = null;
+    	public void setup(org.apache.hadoop.mapreduce.Mapper.Context context) throws IOException, InterruptedException {
+    		prefixMatch = new URLPrefixPatternMatch();
+    		
+    		String path = "pattern.txt";
+    	    InputStream is = getClass().getClassLoader().getResourceAsStream(path);
+    	    if (is == null) {
+    	    	throw new IOException();
+    	    }
+    	    try {
+    	      if (path.endsWith(".gz"))
+    	        is = new GZIPInputStream(new BufferedInputStream(is));
+    	      else
+    	        is = new BufferedInputStream(is);
+    	    } catch (IOException e) {
+    	      System.err.println("CLASSPATH resource " + path + " is not a GZIP stream!");
+    	    }
+    		
+    		prefixMatch.Load(is);
+    	}
+    	
 		public void map(Object key, Text value, Context context)
 				throws IOException, InterruptedException
 		{
@@ -68,44 +61,36 @@ public class DocumentProcess {
 		    
 		    CompositeDoc compositeDoc = CompositeDocSerialize.DeSerialize(segments[1], context);
 		    
-		    textProcess.Process(compositeDoc);
+	    	ClassifierInputTarget inputAdapter = new ClassifierInputAllNLPAdapter();
+	    	String res = inputAdapter.GetInputText(compositeDoc);
+	    	
+	    	String label = prefixMatch.GetMatchedPatternLabel(compositeDoc.doc_url);
+	    	
+	    	if (label != null && !label.isEmpty()) {
+	    		context.getCounter("custom", "Get prefix label").increment(1);;
+	    	} else {
+	    		context.getCounter("custom", "Empty label").increment(1);;
+	    	}
 		    
-		    context.write(new Text(segments[0]), new Text(CompositeDocSerialize.Serialize(compositeDoc, context)));
-
+	    	if (label == null) {
+	    		label = "NoMatch";
+	    	}
+	    	context.write(new Text(compositeDoc.doc_url), new Text(label + "\t" + res));
 		}
     }
-	public static class Reduce extends Reducer<Text, Text, Text, Text>
-	{
-		public void reduce(Text key, Iterable<Text> values,Context context)
-				throws IOException, InterruptedException
-		{
-			for (Text text : values) {
-				context.write(key, text);
-			}
-		}
-	}
+    
+    
     public static void main(String[] args) throws Exception
     {
     	Configuration conf = new Configuration();
-    	
-    	conf.set("type", "classifier_data");
-    	conf.set("mapreduce.map.memory.mb", "5000");
-    	conf.set("mapreduce.map.java.opts", "-Xmx4608m");
-    	
-    	/*String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-    	if (otherArgs.length != 2) {
-    		System.err.println("Usage: wordcount <in> <out>");
-    		System.exit(2);
-    	}*/
+
         String[] libjarsArr = args[2].split(",");
         for (int i = 0; i < libjarsArr.length; ++i) {
         	addTmpJar(libjarsArr[i], conf);
         }
-    	Job job = new Job(conf, "Stanford NLP process");
-    	job.setJarByClass(DocumentProcess.class);
+    	Job job = new Job(conf, "Classification training");
+    	job.setJarByClass(ClassificationTrainingDataMapReduce.class);
     	job.setMapperClass(Map.class);
-    	//job.setCombinerClass(Reduce.class);
-    	job.setReducerClass(Reduce.class);
     	job.setNumReduceTasks(0);
     	job.setOutputKeyClass(Text.class);
     	job.setOutputValueClass(Text.class);
@@ -137,5 +122,4 @@ public class DocumentProcess {
 			conf.set("tmpjars", tmpjars + "," + newJarPath);
 		}
 	}
-
 }

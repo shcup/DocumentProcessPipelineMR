@@ -38,19 +38,6 @@ public class IDFMapReduce {
 
     public static class Map extends  Mapper<Object, Text, Text, Text>
     {
-		//private CompositeDocTextProcess textProcess;
-		
-		public void setup(org.apache.hadoop.mapreduce.Mapper.Context context) throws IOException, InterruptedException {
-			/*System.out.println("begin to setup function!");
-			try {
-				textProcess = new CompositeDocTextProcess();
-				//nlpProcess = new CompositeDocNLPProcess();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	*/
-		}
-
 		public void map(Object key, Text value, Context context)
 				throws IOException, InterruptedException
 		{
@@ -65,9 +52,9 @@ public class IDFMapReduce {
 		    CompositeDoc compositeDoc = CompositeDocSerialize.DeSerialize(segments[1], context);
 		    
 	    	IDFGenerator idfGenerator = new IDFGenerator();
-	    	HashSet items = idfGenerator.GetItemList(compositeDoc);
-	    	for (Iterator it = items.iterator(); it.hasNext();) {
-	    		context.write(new Text((String)(it.next())), new Text(segments[0]));
+	    	HashSet<String> items = idfGenerator.GetItemList(compositeDoc);
+	    	for (Iterator<String> it = items.iterator(); it.hasNext();) {
+	    		context.write(new Text(it.next()), new Text(segments[0]));
 	    	}
 		}
     }
@@ -97,7 +84,9 @@ public class IDFMapReduce {
     	Job job = new Job(conf, "IDF Mapreduce");
     	job.setJarByClass(IDFMapReduce.class);
     	job.setMapperClass(Map.class);
-    	job.setCombinerClass(Reduce.class);
+    	job.setMapOutputKeyClass(Text.class);
+    	job.setMapOutputValueClass(Text.class);
+    	//job.setCombinerClass(Reduce.class);
     	job.setReducerClass(Reduce.class);
     	job.setNumReduceTasks(30);
     	job.setOutputKeyClass(Text.class);

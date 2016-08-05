@@ -1,6 +1,7 @@
 package DocProcessClassification.PatternMatch;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import DocProcessUtil.Trie;
 
@@ -9,6 +10,10 @@ public class URLPrefixPatternMatch {
 	
 	public void Load(String patternFile) throws IOException {
 		patterns.Load(patternFile);
+	}
+	
+	public void Load(InputStream input) throws IOException {
+		patterns.Load(input);
 	}
 	
 	public String GetMatchedPatternLabel(String URL) {
