@@ -15,7 +15,7 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 			for (String word : compositeDoc.title_words) {
 				sb.append("tw_");
 				sb.append(word);
-				sb.append('\t');
+				sb.append(' ');
 			}
 		}
 		
@@ -23,7 +23,7 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 			for (String word : compositeDoc.body_words) {
 				sb.append("bw_");
 				sb.append(word);
-				sb.append('\t');
+				sb.append(' ');
 			}
 		}
 		
@@ -31,7 +31,7 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 			for (String word : compositeDoc.title_2grams) {
 				sb.append("t2_");
 				sb.append(word);
-				sb.append('\t');
+				sb.append(' ');
 			}			
 		}
 
@@ -39,7 +39,7 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 			for (String word : compositeDoc.body_2grams) {
 				sb.append("b2_");
 				sb.append(word);
-				sb.append('\t');
+				sb.append(' ');
 			}
 		}
 		
@@ -48,21 +48,21 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 			for (String word : compositeDoc.title_np) {
 				sb.append("tnp_");
 				sb.append(word);
-				sb.append('\t');
+				sb.append(' ');
 			}
 		}
 		if (compositeDoc.body_np != null) {
 			for (String word : compositeDoc.title_nnp) {
 				sb.append("tnnp_");
 				sb.append(word);
-				sb.append('\t');
+				sb.append(' ');
 			}
 		}
 		if (compositeDoc.title_NER_person != null) {
 			for (String word : compositeDoc.title_NER_person) {
 				sb.append("tep_");
 				sb.append(word);
-				sb.append('\t');
+				sb.append(' ');
 			}			
 		}
 
@@ -70,14 +70,14 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 			for (String word : compositeDoc.title_NER_location) {
 				sb.append("tel_");
 				sb.append(word);
-				sb.append('\t');
+				sb.append(' ');
 			}
 		}
 		if (compositeDoc.title_NER_organization != null) {
 			for (String word : compositeDoc.title_NER_organization) {
 				sb.append("teo_");
 				sb.append(word);
-				sb.append('\t');
+				sb.append(' ');
 			}
 		}
 
@@ -98,7 +98,7 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 				continue;
 			}
 			sb.append(item.name);
-			sb.append('\t');
+			sb.append(' ');
 		}
 		
 		return sb.toString();
