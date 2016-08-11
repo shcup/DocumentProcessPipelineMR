@@ -127,7 +127,7 @@ www.telegraph.co.uk/news/	news
 www.telegraph.co.uk/cricket/	circket
 www.telegraph.co.uk/rugby-union/	sports
 www.telegraph.co.uk/football/	sports
-www.telegraph.co.uk/formula-1/		sports
+www.telegraph.co.uk/formula-1/	sports
 www.telegraph.co.uk/golf/	sports
 www.telegraph.co.uk/cycling/	sports
 www.telegraph.co.uk/tennis/	sports
@@ -174,4 +174,3 @@ www.newindianexpress.com/cricket/news/	circket
 www.newindianexpress.com/sport/	sports
 www.newindianexpress.com/entertainment/	showbiz
 www.newindianexpress.com/thesundaystandard/	india
-

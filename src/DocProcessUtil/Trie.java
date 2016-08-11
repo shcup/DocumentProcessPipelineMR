@@ -162,6 +162,9 @@ public class Trie {
 		BufferedReader br=new BufferedReader(new InputStreamReader(input));
         String line;
         while((line=br.readLine())!=null) {
+        	if (line.isEmpty()) {
+        		continue;
+        	}
         	String[] items = line.split("\t");
         	if (items.length != 2) {
         		System.exit(-1);
