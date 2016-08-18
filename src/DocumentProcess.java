@@ -1,9 +1,12 @@
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -29,8 +32,10 @@ import DocProcess.CompositeDocSerialize;
 import DocProcess.IDF.IDFGenerator;
 import DocProcessClassification.DataAdapter.ClassifierInputAllNLPAdapter;
 import DocProcessClassification.DataAdapter.ClassifierInputTarget;
+import DocProcessClassification.PatternMatch.URLPrefixPatternMatch;
 import leso.media.ImageTextDoc;
 import pipeline.CompositeDoc;
+import pipeline.basictypes.CategoryItem;
 
 // this maprecude program is based on hadoop 2.6, the low version is not supported
 public class DocumentProcess {
@@ -43,6 +48,7 @@ public class DocumentProcess {
 		private Text word = new Text();
 		private CompositeDocTextProcess textProcess;
 		private CompositeDocNLPProcess nlpProcess;
+		URLPrefixPatternMatch prefixMatch = null;
 		
 		public void setup(org.apache.hadoop.mapreduce.Mapper.Context context) throws IOException, InterruptedException {
 			System.out.println("begin to setup function!");
@@ -53,6 +59,23 @@ public class DocumentProcess {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}	
+    		prefixMatch = new URLPrefixPatternMatch();
+    		
+    		String path = "pattern.txt";
+    	    InputStream is = getClass().getClassLoader().getResourceAsStream(path);
+    	    if (is == null) {
+    	    	throw new IOException();
+    	    }
+    	    try {
+    	      if (path.endsWith(".gz"))
+    	        is = new GZIPInputStream(new BufferedInputStream(is));
+    	      else
+    	        is = new BufferedInputStream(is);
+    	    } catch (IOException e) {
+    	      System.err.println("CLASSPATH resource " + path + " is not a GZIP stream!");
+    	    }
+    		
+    		prefixMatch.Load(is);
 		}
 
 		public void map(Object key, Text value, Context context)
@@ -69,6 +92,28 @@ public class DocumentProcess {
 		    CompositeDoc compositeDoc = CompositeDocSerialize.DeSerialize(segments[1], context);
 		    
 		    textProcess.Process(compositeDoc);
+		    
+	    	String label = prefixMatch.GetMatchedPatternLabel(compositeDoc.doc_url);
+	    	ClassifierInputTarget inputAdapter = new ClassifierInputAllNLPAdapter();
+	    	String res = inputAdapter.GetInputText(compositeDoc);
+	    	compositeDoc.classifier_input = res;
+	    	if (label != null && !label.isEmpty()) {
+	    		context.getCounter("custom", "Get prefix label").increment(1);;
+	    	} else {
+	    		context.getCounter("custom", "Empty label").increment(1);;
+	    	}		    
+	    	if (label != null) {
+	    		if (compositeDoc.media_doc_info.normalized_category_info == null) {
+	    			compositeDoc.media_doc_info.normalized_category_info = new pipeline.basictypes.CategoryInfo();
+	    		}
+	    		CategoryItem categoryItem = new CategoryItem();
+	    		categoryItem.category_path = new ArrayList<String>();
+	    		categoryItem.category_path.add(label);
+	    		if (compositeDoc.media_doc_info.normalized_category_info.category_item == null) {
+	    			compositeDoc.media_doc_info.normalized_category_info.category_item = new ArrayList<pipeline.basictypes.CategoryItem>();
+	    		}
+	    		compositeDoc.media_doc_info.normalized_category_info.category_item.add(categoryItem);	   			    		
+	    	}
 		    
 		    context.write(new Text(segments[0]), new Text(CompositeDocSerialize.Serialize(compositeDoc, context)));
 

@@ -76,7 +76,7 @@ public class ClassificationTrainingDataMapReduce {
 	    		label = "NoMatch";
 	    	}
 	    	context.write(new Text(compositeDoc.doc_url), new Text(label + "\t" + res));
-		}
+		} 
     }
     
     
