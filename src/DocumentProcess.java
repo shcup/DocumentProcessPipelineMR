@@ -108,7 +108,11 @@ public class DocumentProcess {
 	    		}
 	    		CategoryItem categoryItem = new CategoryItem();
 	    		categoryItem.category_path = new ArrayList<String>();
-	    		categoryItem.category_path.add(label);
+	    		String[] full_category = label.split(": ");
+	    		for (int i = 0; i < full_category.length; ++i) {
+	    			categoryItem.category_path.add(full_category[i]);
+	    		}
+	    		
 	    		if (compositeDoc.media_doc_info.normalized_category_info.category_item == null) {
 	    			compositeDoc.media_doc_info.normalized_category_info.category_item = new ArrayList<pipeline.basictypes.CategoryItem>();
 	    		}
