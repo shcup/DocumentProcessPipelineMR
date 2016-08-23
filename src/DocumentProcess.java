@@ -108,7 +108,7 @@ public class DocumentProcess {
 	    		}
 	    		CategoryItem categoryItem = new CategoryItem();
 	    		categoryItem.category_path = new ArrayList<String>();
-	    		String[] full_category = label.split(": ");
+	    		String[] full_category = label.split(":");
 	    		for (int i = 0; i < full_category.length; ++i) {
 	    			categoryItem.category_path.add(full_category[i]);
 	    		}

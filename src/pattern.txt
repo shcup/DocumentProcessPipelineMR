@@ -2,28 +2,28 @@ www.msn.com/en-in/entertainment/	Entertainment
 www.msn.com/en-in/sports/	Sports
 www.msn.com/en-in/money/	Business
 www.msn.com/en-in/lifestyle/	Lifestyle
-www.msn.com/en-in/health/	Lifestyle: Health
-www.msn.com/en-in/foodanddrink/	Lifestyle: Health: Food
-www.msn.com/en-in/travel/	Lifestyle: Travel
-www.msn.com/en-in/autos/	Autos	
+www.msn.com/en-in/health/	Lifestyle:Health
+www.msn.com/en-in/foodanddrink/	Lifestyle:Health:Food
+www.msn.com/en-in/travel/	Lifestyle:Travel
+www.msn.com/en-in/autos/	Autos
 in.finance.yahoo.com/news/	Business
-cricket.yahoo.com/news/	Sports: Cricket
+cricket.yahoo.com/news/	Sports:Cricket
 in.style.yahoo.com/	Lifestyle
 allaboutcars.yahoo.com/post/	Autos
 www.india.com/news/world/	World
 www.india.com/news/india/	India
-www.india.com/news/cities/	India: City
+www.india.com/news/cities/	India:City
 www.india.com/sports/	Sports
-www.india.com/cricket-2/	Sports: Cricket
+www.india.com/cricket-2/	Sports:Cricket
 www.india.com/showbiz/	Entertainment
-www.dailypioneer.com/nation/	India: National
+www.dailypioneer.com/nation/	India:National
 www.dailypioneer.com/business	Business
 www.dailypioneer.com/world/	World
-www.dailypioneer.com/city/	India: City
+www.dailypioneer.com/city/	India:City
 www.dailypioneer.com/sports/	Sports
 indianexpress.com/india/	India
 indianexpress.com/article/world/world-news/	World
-indianexpress.com/article/opinion/columns/	Opinions: Columns
+indianexpress.com/article/opinion/columns/	Opinions:Columns
 indianexpress.com/article/lifestyle/	Lifestyle
 indianexpress.com/article/technology/	Sci-Tech
 indianexpress.com/article/entertainment/	Entertainment
@@ -33,9 +33,9 @@ www.thestatesman.com/news/sports/	Sports
 www.thestatesman.com/news/business/	Business
 www.thestatesman.com/news/opinion/	Opinions
 www.thestatesman.com/news/life-style/	Lifestyle
-www.thestatesman.com/news/delhi/	India: City
-www.thestatesman.com/news/bengal/	India: City
-www.thestatesman.com/news/odisha/	India: City
+www.thestatesman.com/news/delhi/	India:City
+www.thestatesman.com/news/bengal/	India:City
+www.thestatesman.com/news/odisha/	India:City
 www.thestatesman.com/news/features/	Lifestyle
 timesofindia.indiatimes.com/india/	India
 timesofindia.indiatimes.com/world/	World
@@ -54,24 +54,24 @@ www.deccanchronicle.com/technology	Sci-Tech
 www.deccanchronicle.com/lifestyle	Lifestyle
 www.hindustantimes.com/india-news/	India
 www.hindustantimes.com/world-news/	World
-www.hindustantimes.com/us-presidential-election/	India: National
-www.hindustantimes.com/editorials/	Opinions: Editorial
+www.hindustantimes.com/us-presidential-election/	India:National
+www.hindustantimes.com/editorials/	Opinions:Editorial
 www.hindustantimes.com/analysis/	Opinions
-www.hindustantimes.com/cricket/	Sports: Cricket
-www.hindustantimes.com/football/	Sports: Football
-www.hindustantimes.com/olympics/	Sports: Others
-www.hindustantimes.com/tennis/	Sports: Tennis
-www.hindustantimes.com/other-sports/	Sports: Others
+www.hindustantimes.com/cricket/	Sports:Cricket
+www.hindustantimes.com/football/	Sports:Football
+www.hindustantimes.com/olympics/	Sports:Others
+www.hindustantimes.com/tennis/	Sports:Tennis
+www.hindustantimes.com/other-sports/	Sports:Others
 www.hindustantimes.com/hollywood/	Entertainment
 www.hindustantimes.com/bollywood/	Entertainment
 www.hindustantimes.com/tv/	Entertainment
-www.hindustantimes.com/music/	Entertainment	
-www.hindustantimes.com/health-and-fitness/	Lifestyle: Health
-www.hindustantimes.com/art-and-culture/	Lifestyle: Art & Culture
-www.hindustantimes.com/sex-and-relationships/	Lifestyle: Relationships
-www.hindustantimes.com/fashion-and-trends/	Lifestyle: Fashion & Beauty
-www.hindustantimes.com/travel/	Lifestyle: Travel
-www.hindustantimes.com/books/	Lifestyle: Books
+www.hindustantimes.com/music/	Entertainment
+www.hindustantimes.com/health-and-fitness/	Lifestyle:Health
+www.hindustantimes.com/art-and-culture/	Lifestyle:Art & Culture
+www.hindustantimes.com/sex-and-relationships/	Lifestyle:Relationships
+www.hindustantimes.com/fashion-and-trends/	Lifestyle:Fashion & Beauty
+www.hindustantimes.com/travel/	Lifestyle:Travel
+www.hindustantimes.com/books/	Lifestyle:Books
 www.hindustantimes.com/tech/	Sci-Tech
 www.hindustantimes.com/business-news/	Business
 www.hindustantimes.com/autos/	Autos
@@ -85,7 +85,7 @@ indianexpress.com/article/lifestyle/	Lifestyle
 indianexpress.com/article/technology/	Sci-Tech
 www.rediff.com/business/	Business
 www.rediff.com/sports/report/	Sports
-www.rediff.com/cricket/report/	Sports: Cricket
+www.rediff.com/cricket/report/	Sports:Cricket
 zeenews.india.com/news/india/	India
 zeenews.india.com/news/world/	World
 zeenews.india.com/news/americas/	World
@@ -98,34 +98,34 @@ zeenews.india.com/business/news/economy/	Business
 zeenews.india.com/business/news/companies/	Business
 zeenews.india.com/business/realestate/	Business
 zeenews.india.com/business/automobiles/	Autos
-zeenews.india.com/business/gadgets/gadgets-news/	Sci-Tech: Gadgets	
-zeenews.india.com/news/internet-social-media/	Sci-Tech: Internet: Social Media
-zeenews.india.com/news/space/	Sci-Tech: Science
-zeenews.india.com/news/science/	Sci-Tech: Science
+zeenews.india.com/business/gadgets/gadgets-news/	Sci-Tech:Gadgets
+zeenews.india.com/news/internet-social-media/	Sci-Tech:Internet:Social Media
+zeenews.india.com/news/space/	Sci-Tech:Science
+zeenews.india.com/news/science/	Sci-Tech:Science
 zeenews.india.com/sports/	Sports
 zeenews.india.com/entertainment/	Entertainment
-zeenews.india.com/health/	Lifestyle: Health
-www.financialexpress.com/markets/	Business: Markets
-www.financialexpress.com/companies/	Business: Companies
-www.financialexpress.com/economy/	Business: Economy & Finance
-www.financialexpress.com/industry/companies/	Business: Companies
+zeenews.india.com/health/	Lifestyle:Health
+www.financialexpress.com/markets/	Business:Markets
+www.financialexpress.com/companies/	Business:Companies
+www.financialexpress.com/economy/	Business:Economy & Finance
+www.financialexpress.com/industry/companies/	Business:Companies
 www.financialexpress.com/industry/tech/	Sci-Tech
 www.financialexpress.com/industry/banking-finance/	Business
 www.financialexpress.com/india-news/	India
 www.financialexpress.com/auto/	Autos
-www.financialexpress.com/industry/	Business	
+www.financialexpress.com/industry/	Business
 www.financialexpress.com/fe-columnist/	politics
-www.telegraph.co.uk/cricket/	Sports: Cricket
-www.telegraph.co.uk/rugby-union/	Sports: Others
-www.telegraph.co.uk/football/	Sports: Football
-www.telegraph.co.uk/formula-1/	Sports: F1
-www.telegraph.co.uk/golf/	sports: Others
-www.telegraph.co.uk/cycling/	Sports: Others
-www.telegraph.co.uk/tennis/	Sports: Tennis
-www.telegraph.co.uk/boxing/	Sports: Others
-www.telegraph.co.uk/olympics/	Sports: Others
+www.telegraph.co.uk/cricket/	Sports:Cricket
+www.telegraph.co.uk/rugby-union/	Sports:Others
+www.telegraph.co.uk/football/	Sports:Football
+www.telegraph.co.uk/formula-1/	Sports:F1
+www.telegraph.co.uk/golf/	sports:Others
+www.telegraph.co.uk/cycling/	Sports:Others
+www.telegraph.co.uk/tennis/	Sports:Tennis
+www.telegraph.co.uk/boxing/	Sports:Others
+www.telegraph.co.uk/olympics/	Sports:Others
 www.telegraph.co.uk/business/	Business
-www.telegraph.co.uk/personal-banking/	Business: Personal Finance
+www.telegraph.co.uk/personal-banking/	Business:Personal Finance
 www.telegraph.co.uk/money/consumer-affairs/	Business
 www.telegraph.co.uk/investing/funds/	Business
 www.telegraph.co.uk/money/special-reports/	Business
@@ -139,29 +139,29 @@ www.telegraph.co.uk/tax/	Business
 www.telegraph.co.uk/money/transferwise/	Business
 www.telegraph.co.uk/opinion/	Opinions
 www.telegraph.co.uk/science-technology/	Sci-Tech
-www.telegraph.co.uk/science/	Sci-Tech: Science
-www.telegraph.co.uk/books/	Lifestyle: Books
+www.telegraph.co.uk/science/	Sci-Tech:Science
+www.telegraph.co.uk/books/	Lifestyle:Books
 www.telegraph.co.uk/on-demand/	health
-www.telegraph.co.uk/tv/	Entertainment: TV
-www.telegraph.co.uk/films/	Entertainment: Movie
-www.telegraph.co.uk/food-and-drink/	Lifestyle: Health
-www.telegraph.co.uk/fashion/	Lifestyle: Fashion & Beauty
+www.telegraph.co.uk/tv/	Entertainment:TV
+www.telegraph.co.uk/films/	Entertainment:Movie
+www.telegraph.co.uk/food-and-drink/	Lifestyle:Health
+www.telegraph.co.uk/fashion/	Lifestyle:Fashion & Beauty
 www.telegraph.co.uk/women/life/	Lifestyle
 www.telegraph.co.uk/interiors/	Lifestyle
 www.telegraph.co.uk/gardening/	Lifestyle
-www.livemint.com/companies/	Business	
+www.livemint.com/companies/	Business
 www.livemint.com/Industry/	Business
 www.livemint.com/Opinion/	Opinions
 www.livemint.com/Money/	Business
 www.livemint.com/Politics/	India
 www.livemint.com/Consumer/	Business
-www.newindianexpress.com/nation/	India: National
+www.newindianexpress.com/nation/	India:National
 www.newindianexpress.com/world/	World
 www.newindianexpress.com/states/	India
-www.newindianexpress.com/cities/	India: City
+www.newindianexpress.com/cities/	India:City
 www.newindianexpress.com/business/news/	Business
 www.newindianexpress.com/opinion/	Opinions
-www.newindianexpress.com/cricket/news/	Sports: Cricket
+www.newindianexpress.com/cricket/news/	Sports:Cricket
 www.newindianexpress.com/sport/	Sports
 www.newindianexpress.com/entertainment/	Entertainment
 www.newindianexpress.com/thesundaystandard/	India
