@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import org.apache.hadoop.mapreduce.Mapper.Context;
+
 import DocProcess.IDocProcessor;
 import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
@@ -60,7 +62,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
         this.pipeline = new StanfordCoreNLP(props);
 	}
 	
-	public void Process(CompositeDoc compositeDoc) {
+	public int Process(CompositeDoc compositeDoc) {
 		compositeDoc.title_words = new ArrayList<String>();
 		compositeDoc.body_words  = new ArrayList<String>();
 		compositeDoc.title_2grams  = new ArrayList<String>();
@@ -74,9 +76,10 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		HashMap<String, MatchType> nnp_hashmap = new HashMap<String, MatchType>(); 
 		HashMap<String, MatchType> vb_hashmap = new HashMap<String, MatchType>();
 		
-		GetWords2GramFromText(compositeDoc.title, compositeDoc.title_words, compositeDoc.title_2grams, compositeDoc.title_ner, 0, np_hashmap, nnp_hashmap, vb_hashmap);
+		int res = 0;
+		res = res | GetWords2GramFromText(compositeDoc.title, compositeDoc.title_words, compositeDoc.title_2grams, compositeDoc.title_ner, 0, np_hashmap, nnp_hashmap, vb_hashmap);
 		if (compositeDoc.short_desc != null && !compositeDoc.short_desc.isEmpty()) {
-			GetWords2GramFromText(compositeDoc.short_desc, compositeDoc.body_words, compositeDoc.body_2grams, compositeDoc.title_ner, 0, np_hashmap, nnp_hashmap, vb_hashmap);
+			res = res | GetWords2GramFromText(compositeDoc.short_desc, compositeDoc.body_words, compositeDoc.body_2grams, compositeDoc.title_ner, 0, np_hashmap, nnp_hashmap, vb_hashmap);
 		}
 		// write to the composteDoc
 		compositeDoc.title_np = new ArrayList<String>();
@@ -89,7 +92,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		}
 		if (compositeDoc.main_text_list != null) {
 			for (String text : compositeDoc.main_text_list) {
-				GetWords2GramFromText(text, compositeDoc.body_words, compositeDoc.body_2grams, compositeDoc.body_ner, 0, np_hashmap, nnp_hashmap, vb_hashmap);
+				res = res | GetWords2GramFromText(text, compositeDoc.body_words, compositeDoc.body_2grams, compositeDoc.body_ner, 0, np_hashmap, nnp_hashmap, vb_hashmap);
 			}
 		}
 		
@@ -104,6 +107,10 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		weight.clear();
 		ElementWeightCalculate(vb_hashmap, weight, null, null);
 		AddWeight2CompositeDoc(weight, compositeDoc, shared.datatypes.FeatureType.VB);
+		
+		weight.clear();
+		return res;
+		//ElementWeightCalculate(compositeDoc.title_ner, weight, null, null);
 	}
 	
 	public void Process1(CompositeDoc compositeDoc) {
@@ -135,7 +142,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		}
 	}
 	
-	public void GetWords2GramFromText(String documentText, 
+	public int GetWords2GramFromText(String documentText, 
 									   List<String> lemmas, 
 									   List<String> two_grams, 
 									   List<String> ner,
@@ -144,7 +151,11 @@ public class CompositeDocTextProcess implements IDocProcessor {
 									   HashMap<String, MatchType> nnp_hashmap, 
 									   HashMap<String, MatchType> vb_hashmap) {
 		if (documentText == null || documentText.isEmpty()) {
-			return;
+			return 1;
+		}
+		if (documentText.length() > 10000) {
+			System.out.println(documentText + "\n");
+			return 2;
 		}
 		
         // create an empty Annotation just with the given text
@@ -220,6 +231,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		      idx++;
         }
         
+        return 0;
 
 	}
 	

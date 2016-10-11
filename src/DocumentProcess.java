@@ -81,7 +81,7 @@ public class DocumentProcess {
 		public void map(Object key, Text value, Context context)
 				throws IOException, InterruptedException
 		{
-			System.out.println("begin to mapper");
+			//System.out.println("begin to mapper");
 		    String line = value.toString();
 		    String[] segments = line.split("\t");
 		    if (segments.length != 2) {
@@ -91,7 +91,12 @@ public class DocumentProcess {
 		    
 		    CompositeDoc compositeDoc = CompositeDocSerialize.DeSerialize(segments[1], context);
 		    
-		    textProcess.Process(compositeDoc);
+		    int res_status;
+		    res_status = textProcess.Process(compositeDoc);
+		    if ((res_status & 2) != 0) {
+		    	System.out.println("Doc url " + compositeDoc.doc_url);
+		    	context.getCounter("custom", "Too long text").increment(1);;
+		    }
 		    
 	    	String label = prefixMatch.GetMatchedPatternLabel(compositeDoc.doc_url);
 	    	ClassifierInputTarget inputAdapter = new ClassifierInputAllNLPAdapter();
