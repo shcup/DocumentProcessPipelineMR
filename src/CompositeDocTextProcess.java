@@ -76,6 +76,8 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		HashMap<String, MatchType> nnp_hashmap = new HashMap<String, MatchType>(); 
 		HashMap<String, MatchType> vb_hashmap = new HashMap<String, MatchType>();
 		
+		HashMap<String, Integer> entity_hashmap = new HashMap<String, Integer>();
+		
 		int res = 0;
 		res = res | GetWords2GramFromText(compositeDoc.title, compositeDoc.title_words, compositeDoc.title_2grams, compositeDoc.title_ner, 0, np_hashmap, nnp_hashmap, vb_hashmap);
 		if (compositeDoc.short_desc != null && !compositeDoc.short_desc.isEmpty()) {
@@ -104,11 +106,32 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		ElementWeightCalculate(nnp_hashmap, weight, compositeDoc.title_nnp, compositeDoc.body_nnp);
 		AddWeight2CompositeDoc(weight, compositeDoc, shared.datatypes.FeatureType.NNP);
 		
-		weight.clear();
+		/*weight.clear();
 		ElementWeightCalculate(vb_hashmap, weight, null, null);
-		AddWeight2CompositeDoc(weight, compositeDoc, shared.datatypes.FeatureType.VB);
+		AddWeight2CompositeDoc(weight, compositeDoc, shared.datatypes.FeatureType.VB);*/
 		
-		weight.clear();
+		// add the ner feature to feature list
+		for (int i = 0 ;i < compositeDoc.title_ner.size(); ++i) {
+			if (entity_hashmap.containsKey(compositeDoc.title_ner.get(i))) {
+				entity_hashmap.put(compositeDoc.title_ner.get(i), entity_hashmap.get(compositeDoc.title_ner.get(i)) + 3) ;
+			} else {
+				entity_hashmap.put(compositeDoc.title_ner.get(i), 3) ;
+			}
+		}
+		for (int i = 0;i < compositeDoc.body_ner.size(); ++i) {
+			if (entity_hashmap.containsKey(compositeDoc.body_ner.get(i))) {
+				entity_hashmap.put(compositeDoc.body_ner.get(i), entity_hashmap.get(compositeDoc.body_ner.get(i)) + 1) ;
+			} else {
+				entity_hashmap.put(compositeDoc.body_ner.get(i), 1) ;
+			}			
+		}
+		for (Entry<String, Integer> pair : entity_hashmap.entrySet()) {
+			ItemFeature item_feature = new ItemFeature();
+			item_feature.name = pair.getKey().toLowerCase();
+			item_feature.weight = (short) (pair.getValue().shortValue());
+			item_feature.type = shared.datatypes.FeatureType.ORGANIZATION;
+			compositeDoc.feature_list.add(item_feature);
+		}
 		return res;
 		//ElementWeightCalculate(compositeDoc.title_ner, weight, null, null);
 	}
@@ -153,8 +176,8 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		if (documentText == null || documentText.isEmpty()) {
 			return 1;
 		}
-		if (documentText.length() > 10000) {
-			System.out.println(documentText + "\n");
+		if (documentText.length() > 200000) {
+			//System.out.println(documentText + "\n");
 			return 2;
 		}
 		
