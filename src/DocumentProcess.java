@@ -94,7 +94,7 @@ public class DocumentProcess {
 		    int res_status;
 		    res_status = textProcess.Process(compositeDoc);
 		    if ((res_status & 2) != 0) {
-		    	System.out.println("Doc url " + compositeDoc.doc_url);
+		    	//System.out.println("Doc url " + compositeDoc.doc_url);
 		    	context.getCounter("custom", "Too long text").increment(1);;
 		    }
 		    
