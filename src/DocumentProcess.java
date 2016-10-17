@@ -3,37 +3,24 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.StringTokenizer;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.codec.binary.Base64;
-
-import java.io.IOException;
-import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.GenericOptionsParser;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.transport.TMemoryBuffer;
-//import org.apache.commons.cli.Options;
 
+import TextRank.TextRank;
 import DocProcess.CompositeDocSerialize;
-import DocProcess.IDF.IDFGenerator;
 import DocProcessClassification.DataAdapter.ClassifierInputAllNLPAdapter;
 import DocProcessClassification.DataAdapter.ClassifierInputTarget;
 import DocProcessClassification.PatternMatch.URLPrefixPatternMatch;
-import leso.media.ImageTextDoc;
 import pipeline.CompositeDoc;
 import pipeline.basictypes.CategoryItem;
 
@@ -50,6 +37,7 @@ public class DocumentProcess {
 		private CompositeDocNLPProcess nlpProcess;
 		URLPrefixPatternMatch prefixMatch = null;
 		
+		@Override
 		public void setup(org.apache.hadoop.mapreduce.Mapper.Context context) throws IOException, InterruptedException {
 			System.out.println("begin to setup function!");
 			try {
@@ -76,8 +64,11 @@ public class DocumentProcess {
     	    }
     		
     		prefixMatch.Load(is);
+    		 //added by lujing
+    		TextRank.loadStopWords("stopWords");
 		}
 
+		@Override
 		public void map(Object key, Text value, Context context)
 				throws IOException, InterruptedException
 		{
@@ -130,6 +121,7 @@ public class DocumentProcess {
     }
 	public static class Reduce extends Reducer<Text, Text, Text, Text>
 	{
+		@Override
 		public void reduce(Text key, Iterable<Text> values,Context context)
 				throws IOException, InterruptedException
 		{

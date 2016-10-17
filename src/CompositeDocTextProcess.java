@@ -17,6 +17,8 @@ import java.util.Map.Entry;
 
 import org.apache.hadoop.mapreduce.Mapper.Context;
 
+import TextRank.KeyWords;
+import TextRank.TextRank;
 import DocProcess.CompositeDocSerialize;
 import DocProcess.IDocProcessor;
 import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
@@ -66,8 +68,10 @@ public class CompositeDocTextProcess implements IDocProcessor {
         // StanfordCoreNLP loads a lot of models, so you probably
         // only want to do this once per execution
         this.pipeline = new StanfordCoreNLP(props);
+       
 	}
 	
+	@Override
 	public int Process(CompositeDoc compositeDoc) {
 		url = compositeDoc.doc_url;
 		id = compositeDoc.media_doc_info.id;
@@ -139,7 +143,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		for (Entry<String, Integer> pair : entity_hashmap.entrySet()) {
 			ItemFeature item_feature = new ItemFeature();
 			item_feature.name = pair.getKey().toLowerCase();
-			item_feature.weight = (short) (pair.getValue().shortValue());
+			item_feature.weight = (pair.getValue().shortValue());
 			item_feature.type = shared.datatypes.FeatureType.ORGANIZATION;
 			compositeDoc.feature_list.add(item_feature);
 		}
@@ -163,7 +167,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		for (Entry<String, Integer> pair : np_hashmap.entrySet()) {
 			ItemFeature item_feature = new ItemFeature();
 			item_feature.name = pair.getKey().toLowerCase();
-			item_feature.weight = (short) (pair.getValue().shortValue());
+			item_feature.weight = (pair.getValue().shortValue());
 			item_feature.type = shared.datatypes.FeatureType.ORGANIZATION;
 			compositeDoc.feature_list.add(item_feature);
 		}
@@ -186,10 +190,14 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		for (Entry<String, Integer> pair : nnp_hashmap.entrySet()) {
 			ItemFeature item_feature = new ItemFeature();
 			item_feature.name = pair.getKey().toLowerCase();
-			item_feature.weight = (short) (pair.getValue().shortValue());
+			item_feature.weight = (pair.getValue().shortValue());
 			item_feature.type = shared.datatypes.FeatureType.ORGANIZATION;
 			compositeDoc.feature_list.add(item_feature);
-		}		
+		}				
+		//added by lujing		
+		KeyWords keyWords=KeyWords.getKeyWords(compositeDoc.main_text_list,10);
+		compositeDoc.text_rank=keyWords.toItemFeature(keyWords.keyWords);
+		compositeDoc.text_rank_phrase=keyWords.toItemFeature(keyWords.keyTerms);
 		return res;
 		//ElementWeightCalculate(compositeDoc.title_ner, weight, null, null);
 	}
