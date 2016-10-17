@@ -630,6 +630,15 @@ public class CompositeDocTextProcess implements IDocProcessor {
     		for (String word : compositeDoc.body_ner) {
     			sb.append(word + ",");
     		}
+    		sb.append("\nText rank");
+    		
+    		for (shared.datatypes.ItemFeature item : compositeDoc.text_rank) {
+    			sb.append(item.name + ",");
+    		}
+    		sb.append("\nText rank phrase");
+    		for (shared.datatypes.ItemFeature item : compositeDoc.text_rank_phrase) {
+    			sb.append(item.name + ",");
+    		}
     		sb.append('\n');
     		
     		out.write(sb.toString().getBytes());
