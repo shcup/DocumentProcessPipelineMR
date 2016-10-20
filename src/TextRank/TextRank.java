@@ -2,6 +2,8 @@ package TextRank;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
+
 public class TextRank
 {
 	public static Set<String> stopWords=new HashSet<String>();
@@ -32,14 +35,19 @@ public class TextRank
 			if (line.isEmpty()) {
 				continue;
 			}
-			result.add(line);
+			stopWords.add(line);
 
 		}	
 		return result;
 	}
 	public static void loadStopWords(String path) throws IOException{
+		/*File f=new File(path);
+		if(f.exists()){
+			System.out.println("a");
+		}*/
 
 		InputStream is = new Object().getClass().getClassLoader().getResourceAsStream(path);
+		//InputStream is =new FileInputStream(f);
 		if (is == null) {
 			throw new IOException();
 		}
@@ -65,17 +73,17 @@ public class TextRank
 	//	}
 	//	public static final int nKeyword = 10;
 	/**
-	 * 阻尼系数（ＤａｍｐｉｎｇＦａｃ�?ｔｏｒ），一般取值为0.85
+	 * 闃诲凹绯绘暟锛堬激锝侊綅锝愶綁锝庯絿锛︼絹锝冿拷?锝旓綇锝掞級锛屼竴鑸彇鍊间负0.85
 	 */
 	static final float d = 0.85f;
 	/**
-	 * �?��迭代次数
+	 * 锟�锟斤拷杩唬娆℃暟
 	 */
 	static final int max_iter = 200;
 	static final float min_diff = 0.001f;
 
 	/**
-	 * 将文章分割为句子
+	 * 灏嗘枃绔犲垎鍓蹭负鍙ュ瓙
 	 * @param document
 	 * @return
 	 */
@@ -87,7 +95,7 @@ public class TextRank
 		{
 			line = line.trim();
 			if (line.length() == 0) continue;
-			for (String sent : line.split("[�?�?:：�?”？?�?�?]"))
+			for (String sent : line.split("[锟�锟�:锛氾拷?鈥濓紵?锟�锟�]"))
 			{
 				sent = sent.trim();
 				if (sent.length() == 0) continue;
@@ -101,8 +109,8 @@ public class TextRank
 
 		return sentences;
 	}
-	public boolean filterWord(String word){
-		if(stopWords.contains(word)){
+	public boolean filterWord(String word,DocProcessUtil.Stopword stopWord){
+		if(stopWord.IsStopWord(word)){
 			return false;
 		}
 		Pattern p=Pattern.compile("^[\\-0-9]*$");
@@ -115,18 +123,18 @@ public class TextRank
 	public static String modifyWord(String word){
 		// word="'the";
 		word=word.replaceAll("'s$", "");
-		String regEx="[\"`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#�?…�?&*（）—�?+|{}【�?‘；：�?“�?。，、？]";
+		String regEx="[\"`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~锛丂#锟�鈥︼拷?&*锛堬級鈥旓拷?+|{}銆愶拷?鈥橈紱锛氾拷?鈥滐拷?銆傦紝銆侊紵]";
 		word=word.replaceAll(regEx, "");
 		return word.toLowerCase();
 
 	}
-	public Map<String, Set<String>> getWordsRelation(List<String[]> sentences){
+	public Map<String, Set<String>> getWordsRelation(List<String[]> sentences,DocProcessUtil.Stopword stopWord){
 		Map<String, Set<String>> words = new HashMap<String, Set<String>>();
 		for(String[] termList:sentences){
 			List<String> wordList = new ArrayList<String>();
 			for (String t : termList)
 			{
-				if(filterWord(t)){
+				if(filterWord(t, stopWord)){
 					wordList.add(t);
 				}
 			}
@@ -224,10 +232,10 @@ public class TextRank
 		return result;
 
 	}
-	public KeyWords getKeyword(List<String> document,int nKeyword)
+	public KeyWords getKeyword(List<String> document,int nKeyword,DocProcessUtil.Stopword stopWord)
 	{
 		List<String[]> sentences=spiltSentence(document);
-		Map<String, Set<String>> words=getWordsRelation(sentences);
+		Map<String, Set<String>> words=getWordsRelation(sentences, stopWord);
 		//        System.out.println(words);
 		Map<String, Float> score = calWordsRank(words);		
 		List<Map.Entry<String, Float>> entryList = new ArrayList<Map.Entry<String, Float>>(score.entrySet());

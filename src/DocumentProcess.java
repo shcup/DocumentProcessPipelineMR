@@ -64,8 +64,6 @@ public class DocumentProcess {
     	    }
     		
     		prefixMatch.Load(is);
-    		 //added by lujing
-    		TextRank.loadStopWords("stopWords");
 		}
 
 		@Override

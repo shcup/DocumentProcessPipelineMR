@@ -19,8 +19,10 @@ import org.apache.hadoop.mapreduce.Mapper.Context;
 
 import TextRank.KeyWords;
 import TextRank.TextRank;
+
 import DocProcess.CompositeDocSerialize;
 import DocProcess.IDocProcessor;
+import DocProcessUtil.Stopword;
 import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
@@ -46,7 +48,7 @@ import shared.datatypes.ItemFeature;
 
 public class CompositeDocTextProcess implements IDocProcessor {
 
-	Stopword stopword = null;	
+	DocProcessUtil.Stopword stopword = null;	
 	Class stemClass = Class.forName("englishStemmer");
     SnowballStemmer stemmer = (SnowballStemmer) stemClass.newInstance();
     protected StanfordCoreNLP pipeline;
@@ -55,6 +57,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
     
 	CompositeDocTextProcess() throws Exception {
 		stopword = new Stopword();
+		
 		// Create StanfordCoreNLP object properties, with POS tagging
         // (required for lemmatization), and lemmatization
         Properties props;
@@ -168,7 +171,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
 			ItemFeature item_feature = new ItemFeature();
 			item_feature.name = pair.getKey().toLowerCase();
 			item_feature.weight = (pair.getValue().shortValue());
-			item_feature.type = shared.datatypes.FeatureType.ORGANIZATION;
+			item_feature.type = shared.datatypes.FeatureType.NP;
 			compositeDoc.feature_list.add(item_feature);
 		}
 		
@@ -191,13 +194,15 @@ public class CompositeDocTextProcess implements IDocProcessor {
 			ItemFeature item_feature = new ItemFeature();
 			item_feature.name = pair.getKey().toLowerCase();
 			item_feature.weight = (pair.getValue().shortValue());
-			item_feature.type = shared.datatypes.FeatureType.ORGANIZATION;
+			item_feature.type = shared.datatypes.FeatureType.NNP;
 			compositeDoc.feature_list.add(item_feature);
 		}				
 		//added by lujing		
-		KeyWords keyWords=KeyWords.getKeyWords(compositeDoc.main_text_list,10);
+		KeyWords keyWords=KeyWords.getKeyWords(compositeDoc.main_text_list,10, stopword);
 		compositeDoc.text_rank=keyWords.toItemFeature(keyWords.keyWords);
 		compositeDoc.text_rank_phrase=keyWords.toItemFeature(keyWords.keyTerms);
+		compositeDoc.feature_list.addAll(compositeDoc.text_rank);
+		compositeDoc.feature_list.addAll(compositeDoc.text_rank_phrase);
 		return res;
 		//ElementWeightCalculate(compositeDoc.title_ner, weight, null, null);
 	}
@@ -577,8 +582,10 @@ public class CompositeDocTextProcess implements IDocProcessor {
     
     public static void main(String[] args) throws Exception 
     {
+    	TextRank.loadStopWords("stopWords.txt");
     	CompositeDocTextProcess textProcess = new CompositeDocTextProcess();
     	Scanner scanner = new Scanner(System.in); 
+    	
     	
     	File file = new File("D:\\Temp\\part-00017");//Text文件
     	BufferedReader br = new BufferedReader(new FileReader(file));//构造一个BufferedReader类来读取文件
@@ -630,12 +637,12 @@ public class CompositeDocTextProcess implements IDocProcessor {
     		for (String word : compositeDoc.body_ner) {
     			sb.append(word + ",");
     		}
-    		sb.append("\nText rank");
+    		sb.append("\nText rank: ");
     		
     		for (shared.datatypes.ItemFeature item : compositeDoc.text_rank) {
     			sb.append(item.name + ",");
     		}
-    		sb.append("\nText rank phrase");
+    		sb.append("\nText rank phrase: ");
     		for (shared.datatypes.ItemFeature item : compositeDoc.text_rank_phrase) {
     			sb.append(item.name + ",");
     		}
