@@ -199,8 +199,8 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		}				
 		//added by lujing		
 		KeyWords keyWords=KeyWords.getKeyWords(compositeDoc.main_text_list,10, stopword);
-		compositeDoc.text_rank=keyWords.toItemFeature(keyWords.keyWords);
-		compositeDoc.text_rank_phrase=keyWords.toItemFeature(keyWords.keyTerms);
+		compositeDoc.text_rank=keyWords.toItemFeature(keyWords.keyWords, shared.datatypes.FeatureType.TAG);
+		compositeDoc.text_rank_phrase=keyWords.toItemFeature(keyWords.keyTerms, shared.datatypes.FeatureType.LABEL);
 		compositeDoc.feature_list.addAll(compositeDoc.text_rank);
 		compositeDoc.feature_list.addAll(compositeDoc.text_rank_phrase);
 		return res;

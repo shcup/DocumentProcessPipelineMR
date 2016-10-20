@@ -18,13 +18,13 @@ import shared.datatypes.ItemFeature;
 public class  KeyWords{
 	public List<Entry<String,Float>> keyWords=new ArrayList<Entry<String,Float>>();
 	public List<Entry<String,Float>> keyTerms=new ArrayList<Entry<String,Float>>();
-	public List<ItemFeature> toItemFeature(List<Entry<String,Float>> keyWords){
+	public List<ItemFeature> toItemFeature(List<Entry<String,Float>> keyWords, shared.datatypes.FeatureType type){
 		List<ItemFeature> result=new ArrayList<ItemFeature>();
 		for(Entry<String,Float> e:keyWords){
 			ItemFeature itemFeature=new ItemFeature();
 			itemFeature.name=e.getKey();
 			itemFeature.weight=(short) (e.getValue()*10000);
-			itemFeature.type = shared.datatypes.FeatureType.LABEL;
+			itemFeature.type = type;
 			result.add(itemFeature);
 		}
 		return result;
