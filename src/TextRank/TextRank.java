@@ -95,7 +95,7 @@ public class TextRank
 		{
 			line = line.trim();
 			if (line.length() == 0) continue;
-			for (String sent : line.split("[,|.|;|!|?]"))
+			for (String sent : line.split("[,.;!?]"))
 			{
 				sent = sent.trim();
 				if (sent.length() == 0) continue;
