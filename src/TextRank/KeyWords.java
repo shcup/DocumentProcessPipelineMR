@@ -23,7 +23,7 @@ public class  KeyWords{
 		for(Entry<String,Float> e:keyWords){
 			ItemFeature itemFeature=new ItemFeature();
 			itemFeature.name=e.getKey();
-			itemFeature.weight=(short) (e.getValue()*10000);
+			itemFeature.weight=(short) (e.getValue()*100);
 			itemFeature.type = type;
 			result.add(itemFeature);
 		}
@@ -38,7 +38,7 @@ public class  KeyWords{
 	}
 	public static void main(String[] args) throws IOException
 	{
-		String line="afasf,asfadf.asfdasf?asfadfd";
+		String line="afasf,asfadf.asfdasf?asfad|fd";
 		String[] ss=line.split("[,|.|;|\\!|\\?]");
 		System.out.println("a");
 
