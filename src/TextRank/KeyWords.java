@@ -23,7 +23,7 @@ public class  KeyWords{
 		for(Entry<String,Float> e:keyWords){
 			ItemFeature itemFeature=new ItemFeature();
 			itemFeature.name=e.getKey();
-			itemFeature.weight=(short) (e.getValue()*10000);
+			itemFeature.weight=(short) (e.getValue()*100);
 			itemFeature.type = type;
 			result.add(itemFeature);
 		}

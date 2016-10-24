@@ -321,6 +321,8 @@ public class CompositeDocTextProcess implements IDocProcessor {
                 }
                 preWord = word;
             }
+            //used for sentence split
+            lemmas.add("\t");
     		if (sb.length() != 0) {
     			ner.add(sb.toString());
     			sb = new StringBuilder();
