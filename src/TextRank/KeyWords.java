@@ -38,8 +38,8 @@ public class  KeyWords{
 	}
 	public static void main(String[] args) throws IOException
 	{
-		String line="afasf,asfadf.asfdasf?asfad|fd";
-		String[] ss=line.split("[,|.|;|\\!|\\?]");
+		String line="afasf,asfadf.asfdasf?asfadfd";
+		String[] ss=line.split("[,.;!?]");
 		System.out.println("a");
 
 	}
