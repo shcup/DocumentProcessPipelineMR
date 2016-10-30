@@ -49,7 +49,7 @@ public class InvertIndexBuilderMapReduce {
 		    int total_word_count = 0;
 		    if (compositeDoc.title_words != null) {
 		    	for (String word : compositeDoc.title_words) {
-		    		if (!word.isEmpty()) {
+		    		if (!word.isEmpty() && word != "¡£") {
 		    			Integer word_map_value = word_map.get(word);
 		    			Integer new_word_map_value = word_map_value == null ? 1 : word_map_value + 1;
 		    			word_map.put(word, new_word_map_value);
@@ -60,7 +60,7 @@ public class InvertIndexBuilderMapReduce {
 		    }
 		    if (compositeDoc.body_words != null) {
 		    	for (String word : compositeDoc.body_words) {
-		    		if (!word.isEmpty()) {
+		    		if (!word.isEmpty() && word != "\t" && word != "|") {
 		    			Integer word_map_value = word_map.get(word);
 		    			Integer new_word_map_value = word_map_value == null ? 1 : word_map_value + 1;
 		    			word_map.put(word, new_word_map_value);

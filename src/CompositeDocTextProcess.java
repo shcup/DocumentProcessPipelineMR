@@ -322,7 +322,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
                 preWord = word;
             }
             //used for sentence split
-            lemmas.add("\t");
+            lemmas.add(".");
     		if (sb.length() != 0) {
     			ner.add(sb.toString());
     			sb = new StringBuilder();
@@ -589,7 +589,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
     	Scanner scanner = new Scanner(System.in); 
     	
     	
-    	File file = new File("D:\\Temp\\part-00017");//Text文件
+    	File file = new File("D:\\Temp\\part-00029");//Text文件
     	BufferedReader br = new BufferedReader(new FileReader(file));//构造一个BufferedReader类来读取文件
     	String line = null;
     	
