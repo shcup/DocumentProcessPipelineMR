@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.Map.Entry;
 
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 
 import TextRank.KeyWords;
@@ -145,9 +146,9 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		}
 		for (Entry<String, Integer> pair : entity_hashmap.entrySet()) {
 			ItemFeature item_feature = new ItemFeature();
-			item_feature.name = pair.getKey().toLowerCase();
-			item_feature.weight = (pair.getValue().shortValue());
-			item_feature.type = shared.datatypes.FeatureType.ORGANIZATION;
+			item_feature.setName(pair.getKey().toLowerCase());
+			item_feature.setWeight(pair.getValue().shortValue());
+			item_feature.setType(shared.datatypes.FeatureType.ORGANIZATION);
 			compositeDoc.feature_list.add(item_feature);
 		}
 		
@@ -169,9 +170,9 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		}
 		for (Entry<String, Integer> pair : np_hashmap.entrySet()) {
 			ItemFeature item_feature = new ItemFeature();
-			item_feature.name = pair.getKey().toLowerCase();
-			item_feature.weight = (pair.getValue().shortValue());
-			item_feature.type = shared.datatypes.FeatureType.NP;
+			item_feature.setName(pair.getKey().toLowerCase());
+			item_feature.setWeight(pair.getValue().shortValue());
+			item_feature.setType(shared.datatypes.FeatureType.NP);
 			compositeDoc.feature_list.add(item_feature);
 		}
 		
@@ -192,9 +193,9 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		}
 		for (Entry<String, Integer> pair : nnp_hashmap.entrySet()) {
 			ItemFeature item_feature = new ItemFeature();
-			item_feature.name = pair.getKey().toLowerCase();
-			item_feature.weight = (pair.getValue().shortValue());
-			item_feature.type = shared.datatypes.FeatureType.NNP;
+			item_feature.setName(pair.getKey().toLowerCase());
+			item_feature.setWeight(pair.getValue().shortValue());
+			item_feature.setType(shared.datatypes.FeatureType.NNP);
 			compositeDoc.feature_list.add(item_feature);
 		}				
 		//added by lujing		
@@ -593,7 +594,8 @@ public class CompositeDocTextProcess implements IDocProcessor {
     	BufferedReader br = new BufferedReader(new FileReader(file));//构造一个BufferedReader类来读取文件
     	String line = null;
     	
-        FileOutputStream out = new FileOutputStream("d://Temp//out.txt"); // 输出文件路径   
+        FileOutputStream out = new FileOutputStream("d://Temp//out.txt"); // 输出文件路径  
+
     	while((line = br.readLine())!=null){//使用readLine方法，一次读一行
     		ArrayList<String> lemmas = new  ArrayList<String>();
     		ArrayList<String> two_grams = new  ArrayList<String>();
@@ -609,7 +611,8 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		    }
 		    
 		    CompositeDoc compositeDoc = CompositeDocSerialize.DeSerialize(segments[1], null);
-		    int res_status = textProcess.Process(compositeDoc);	    
+		    int res_status = textProcess.Process(compositeDoc);	
+		    
 		    StringBuilder sb = new StringBuilder();
 		    sb.append(compositeDoc.media_doc_info.id + "\t" + compositeDoc.doc_url + "\n");
 		    
