@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -130,21 +132,14 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		AddWeight2CompositeDoc(weight, compositeDoc, shared.datatypes.FeatureType.VB);*/
 		
 		// add the ner feature to feature list
-		for (int i = 0 ;i < compositeDoc.title_ner.size(); ++i) {
-			if (entity_hashmap.containsKey(compositeDoc.title_ner.get(i))) {
-				entity_hashmap.put(compositeDoc.title_ner.get(i), entity_hashmap.get(compositeDoc.title_ner.get(i)) + 3) ;
-			} else {
-				entity_hashmap.put(compositeDoc.title_ner.get(i), 3) ;
+		
+		List<Entry<String, Integer>> temp_list = GetItemFeature(compositeDoc.title_ner, compositeDoc.body_ner);
+		int limit = 0;
+		for (Entry<String, Integer> pair : temp_list) {
+			if (limit >= 3 && pair.getValue() < 3) {
+				break;
 			}
-		}
-		for (int i = 0;i < compositeDoc.body_ner.size(); ++i) {
-			if (entity_hashmap.containsKey(compositeDoc.body_ner.get(i))) {
-				entity_hashmap.put(compositeDoc.body_ner.get(i), entity_hashmap.get(compositeDoc.body_ner.get(i)) + 1) ;
-			} else {
-				entity_hashmap.put(compositeDoc.body_ner.get(i), 1) ;
-			}			
-		}
-		for (Entry<String, Integer> pair : entity_hashmap.entrySet()) {
+			limit++;
 			ItemFeature item_feature = new ItemFeature();
 			item_feature.setName(pair.getKey().toLowerCase());
 			item_feature.setWeight(pair.getValue().shortValue());
@@ -153,51 +148,21 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		}
 		
 		
-		// np
-		for (int i = 0 ;i < compositeDoc.title_np.size(); ++i) {
-			if (np_hashmap.containsKey(compositeDoc.title_np.get(i))) {
-				np_hashmap.put(compositeDoc.title_np.get(i), np_hashmap.get(compositeDoc.title_np.get(i)) + 3) ;
-			} else {
-				np_hashmap.put(compositeDoc.title_np.get(i), 3) ;
-			}
-		}
-		for (int i = 0;i < compositeDoc.body_np.size(); ++i) {
-			if (np_hashmap.containsKey(compositeDoc.body_np.get(i))) {
-				np_hashmap.put(compositeDoc.body_np.get(i), np_hashmap.get(compositeDoc.body_np.get(i)) + 1) ;
-			} else {
-				np_hashmap.put(compositeDoc.body_np.get(i), 1) ;
-			}			
-		}
-		for (Entry<String, Integer> pair : np_hashmap.entrySet()) {
-			ItemFeature item_feature = new ItemFeature();
-			item_feature.setName(pair.getKey().toLowerCase());
-			item_feature.setWeight(pair.getValue().shortValue());
-			item_feature.setType(shared.datatypes.FeatureType.NP);
-			compositeDoc.feature_list.add(item_feature);
-		}
-		
 		// nnp
-		for (int i = 0 ;i < compositeDoc.title_nnp.size(); ++i) {
-			if (nnp_hashmap.containsKey(compositeDoc.title_nnp.get(i))) {
-				nnp_hashmap.put(compositeDoc.title_nnp.get(i), nnp_hashmap.get(compositeDoc.title_nnp.get(i)) + 3) ;
-			} else {
-				nnp_hashmap.put(compositeDoc.title_nnp.get(i), 3) ;
+		temp_list = GetItemFeature(compositeDoc.title_nnp, compositeDoc.body_nnp);
+		limit = 0;
+		for (Entry<String, Integer> pair : temp_list) {
+			if (limit >= 6 && pair.getValue() < 3) {
+				break;
 			}
-		}
-		for (int i = 0;i < compositeDoc.body_nnp.size(); ++i) {
-			if (nnp_hashmap.containsKey(compositeDoc.body_nnp.get(i))) {
-				nnp_hashmap.put(compositeDoc.body_nnp.get(i), nnp_hashmap.get(compositeDoc.body_nnp.get(i)) + 1) ;
-			} else {
-				nnp_hashmap.put(compositeDoc.body_nnp.get(i), 1) ;
-			}			
-		}
-		for (Entry<String, Integer> pair : nnp_hashmap.entrySet()) {
+			limit++;
 			ItemFeature item_feature = new ItemFeature();
 			item_feature.setName(pair.getKey().toLowerCase());
 			item_feature.setWeight(pair.getValue().shortValue());
 			item_feature.setType(shared.datatypes.FeatureType.NNP);
 			compositeDoc.feature_list.add(item_feature);
-		}				
+		}
+				
 		//added by lujing		
 		KeyWords keyWords=KeyWords.getKeyWords(compositeDoc.main_text_list,10, stopword);
 		compositeDoc.text_rank=keyWords.toItemFeature(keyWords.keyWords, shared.datatypes.FeatureType.TAG);
@@ -205,7 +170,34 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		compositeDoc.feature_list.addAll(compositeDoc.text_rank);
 		compositeDoc.feature_list.addAll(compositeDoc.text_rank_phrase);
 		return res;
-		//ElementWeightCalculate(compositeDoc.title_ner, weight, null, null);
+	}
+	
+	public List<Entry<String, Integer>> GetItemFeature(List<String>  origin_features_title, List<String>  origin_features_body) {
+		HashMap<String, Integer> entity_hashmap = new HashMap<String, Integer>();
+		
+		for (int i = 0 ;i < origin_features_title.size(); ++i) {
+			if (entity_hashmap.containsKey(origin_features_title.get(i))) {
+				entity_hashmap.put(origin_features_title.get(i), entity_hashmap.get(origin_features_title.get(i)) + 3) ;
+			} else {
+				entity_hashmap.put(origin_features_title.get(i), 3) ;
+			}
+		}
+		for (int i = 0;i < origin_features_body.size(); ++i) {
+			if (entity_hashmap.containsKey(origin_features_body.get(i))) {
+				entity_hashmap.put(origin_features_body.get(i), entity_hashmap.get(origin_features_body.get(i)) + 1) ;
+			} else {
+				entity_hashmap.put(origin_features_body.get(i), 1) ;
+			}			
+		}
+		List<Entry<String, Integer>> temp_list = new ArrayList<Entry<String, Integer>>(entity_hashmap.entrySet());
+		Collections.sort(temp_list, new Comparator<Entry<String, Integer>>() {  
+            @Override  
+            public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {   
+                return o2.getValue().compareTo(o1.getValue());  
+            }  
+        }); 
+		
+		return temp_list;		
 	}
 	
 	public void Process1(CompositeDoc compositeDoc) {
