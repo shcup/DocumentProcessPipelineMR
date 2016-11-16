@@ -10,6 +10,10 @@ import pipeline.CompositeDoc;
 import shared.datatypes.FeatureType;
 import shared.datatypes.ItemFeature;
 
+/**
+ * This class is not being used currently...
+ *
+ */
 public class CompositeDocNLPProcess {
 	
 	ShiftReduceParserWraper srparser;

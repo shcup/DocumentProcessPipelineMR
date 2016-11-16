@@ -88,7 +88,7 @@ public class TextRank
 	public static String modifyWord(String word){
 		// word="'the";
 		word=word.replaceAll("'s$", "");
-		String regEx="[\"`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+		String regEx="[\"`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？\u0964]";
 		word=word.replaceAll(regEx, "");
 		return word.toLowerCase();
 

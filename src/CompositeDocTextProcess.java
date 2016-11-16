@@ -580,19 +580,19 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		return  false;
 	}
     
-    public static void main(String[] args) throws Exception 
+    /*public static void main(String[] args) throws Exception 
     {
     	TextRank.loadStopWords("stopWords.txt");
     	CompositeDocTextProcess textProcess = new CompositeDocTextProcess();
     	Scanner scanner = new Scanner(System.in); 
     	
     	
-    	File file = new File("D:\\Temp\\part-00017");//TextÎÄ¼þ
-    	BufferedReader br = new BufferedReader(new FileReader(file));//¹¹ÔìÒ»¸öBufferedReaderÀàÀ´¶ÁÈ¡ÎÄ¼þ
+    	File file = new File("D:\\Temp\\part-00017");//Textï¿½Ä¼ï¿½
+    	BufferedReader br = new BufferedReader(new FileReader(file));//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½BufferedReaderï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½Ä¼ï¿½
     	String line = null;
     	
-        FileOutputStream out = new FileOutputStream("d://Temp//out.txt"); // Êä³öÎÄ¼þÂ·¾¶   
-    	while((line = br.readLine())!=null){//Ê¹ÓÃreadLine·½·¨£¬Ò»´Î¶ÁÒ»ÐÐ
+        FileOutputStream out = new FileOutputStream("d://Temp//out.txt"); // ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Â·ï¿½ï¿½   
+    	while((line = br.readLine())!=null){//Ê¹ï¿½ï¿½readLineï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Î¶ï¿½Ò»ï¿½ï¿½
     		ArrayList<String> lemmas = new  ArrayList<String>();
     		ArrayList<String> two_grams = new  ArrayList<String>();
     		ArrayList<String> ner = new  ArrayList<String>();
@@ -653,5 +653,5 @@ public class CompositeDocTextProcess implements IDocProcessor {
     	}
     	br.close();;
 
-    }
+    }*/
 }
