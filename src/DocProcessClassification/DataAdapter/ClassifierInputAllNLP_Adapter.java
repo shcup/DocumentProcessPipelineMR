@@ -1,5 +1,13 @@
 package DocProcessClassification.DataAdapter;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
 import pipeline.CompositeDoc;
 import shared.datatypes.ItemFeature;
 
@@ -7,61 +15,78 @@ public class ClassifierInputAllNLP_Adapter implements ClassifierInputTarget {
 
 	@Override
 	public String GetInputText(CompositeDoc compositeDoc) {
-		// TODO Auto-generated method stub
+		// TODO Auto-generate method stub
 		StringBuilder sb = new StringBuilder();
 		
 		// text process
+		if(compositeDoc.category_info != null && 
+				compositeDoc.category_info.category_item != null &&
+				compositeDoc.category_info.category_item.get(0).category_path !=null ) {
+			String s=compositeDoc.category_info.category_item.get(0).getCategory_path().toString();
+//		    sb.append(compositeDoc.category_info.category_item.get(0).getCategory_path());
+		    sb.append(s);
+			sb.append(' ');
+		} else {
+			sb.append(' ');
+		}
+		
+		if (compositeDoc.bread_crumbs != null) {
+			for (String word : compositeDoc.bread_crumbs) {
+//				sb.append("");
+				sb.append(word);
+				sb.append(' ');
+			}
+		}
 		if (compositeDoc.title_words != null) {
 			for (String word : compositeDoc.title_words) {
-				sb.append("tw_");
+//				sb.append("");
 				sb.append(word.replace(" ","_"));
 				sb.append(' ');
 			}
 		}
 		
-		if (compositeDoc.body_words != null) {
-			for (String word : compositeDoc.body_words) {
-				sb.append("bw_");
+		if (compositeDoc.body_words != null ) {
+			for (String word : compositeDoc.body_words) {		
 				sb.append(word.replace(" ","_"));
 				sb.append(' ');
 			}
 		}
-		
+
 		if (compositeDoc.title_2grams != null) {
 			for (String word : compositeDoc.title_2grams) {
-				sb.append("t2_");
 				sb.append(word.replace(" ","_"));
-//				String new_word = word.replace(' ', '_');
+//				sb.append(word);
 				sb.append(' ');
 			}			
 		}
 
 		if (compositeDoc.body_2grams != null) {
 			for (String word : compositeDoc.body_2grams) {
-				sb.append("b2_");
 				sb.append(word.replace(" ","_"));
+//				sb.append(word);
 				sb.append(' ');
 			}
 		}
 		
 		// NLP
-		if (compositeDoc.title_np != null) {
-			for (String word : compositeDoc.title_np) {
-				sb.append("tnp_");
+		if (compositeDoc.title_nnp != null) {
+			for (String word : compositeDoc.title_nnp) {
 				sb.append(word.replace(" ","_"));
+//				sb.append(word);
 				sb.append(' ');
 			}
 		}
-		if (compositeDoc.body_np != null) {
-			for (String word : compositeDoc.title_nnp) {
-				sb.append("tnnp_");
+		if (compositeDoc.body_nnp != null) {
+			for (String word : compositeDoc.body_nnp) {
 				sb.append(word.replace(" ","_"));
+//				sb.append(word);
 				sb.append(' ');
 			}
 		}
 		if (compositeDoc.title_NER_person != null) {
 			for (String word : compositeDoc.title_NER_person) {
-				sb.append("tep_");
+//				sb.append("_");
+//				sb.append(word);
 				sb.append(word.replace(" ","_"));
 				sb.append(' ');
 			}			
@@ -69,37 +94,33 @@ public class ClassifierInputAllNLP_Adapter implements ClassifierInputTarget {
 
 		if (compositeDoc.title_NER_location != null) {
 			for (String word : compositeDoc.title_NER_location) {
-				sb.append("tel_");
+//				sb.append("_");
+//				sb.append(word);
 				sb.append(word.replace(" ","_"));
 				sb.append(' ');
 			}
 		}
 		if (compositeDoc.title_NER_organization != null) {
 			for (String word : compositeDoc.title_NER_organization) {
-				sb.append("teo_");
+//				sb.append("_");
+//				sb.append(word);
 				sb.append(word.replace(" ","_"));
+				sb.append(' ');
+			}			
+		}
+		
+		if(compositeDoc.text_rank !=null){
+			for (shared.datatypes.ItemFeature item : compositeDoc.text_rank) {
+				sb.append(item.name);
 				sb.append(' ');
 			}
 		}
-
-		for (ItemFeature item : compositeDoc.feature_list) {
-			if (item.type == shared.datatypes.FeatureType.NP) {
-				sb.append("np_");
-			} else if (item.type == shared.datatypes.FeatureType.NNP) {
-				sb.append("nnp_");
-			} else if (item.type == shared.datatypes.FeatureType.VB) {
-				sb.append("vb_");
-			} else if (item.type == shared.datatypes.FeatureType.PEOPLE) {
-				sb.append("ep_");
-			} else if (item.type == shared.datatypes.FeatureType.LOCATION) {
-				sb.append("el_");
-			} else if (item.type == shared.datatypes.FeatureType.ORGANIZATION) {
-				sb.append("eo_");
-			} else {
-				continue;
+	
+		if(compositeDoc.text_rank_phrase !=null){
+			for (shared.datatypes.ItemFeature item : compositeDoc.text_rank_phrase) {
+				sb.append(item.name);
+				sb.append(' ');
 			}
-			sb.append(item.name);
-			sb.append(' ');
 		}
 		
 		return sb.toString();

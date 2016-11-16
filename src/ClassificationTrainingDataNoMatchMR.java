@@ -1,22 +1,34 @@
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import DocProcess.CompositeDocSerialize;
+import DocProcess.IDF.IDFGenerator;
+import DocProcessClassification.DataAdapter.ClassifierInputAllNLPAdapter;
 import DocProcessClassification.DataAdapter.ClassifierInputAllNLP_Adapter;
 import DocProcessClassification.DataAdapter.ClassifierInputTarget;
 import DocProcessClassification.PatternMatch.URLPrefixPatternMatch;
 import pipeline.CompositeDoc;
+import DocProcessUtil.Stopword;
 
 public class ClassificationTrainingDataNoMatchMR {
     public static class Map extends  Mapper<Object, Text, Text, Text>
@@ -55,27 +67,48 @@ public class ClassificationTrainingDataNoMatchMR {
 		    
 		    CompositeDoc compositeDoc = CompositeDocSerialize.DeSerialize(segments[1], context);
 		    
-	    	ClassifierInputTarget inputAdapter = new ClassifierInputAllNLP_Adapter();
-//	    	String res = inputAdapter.GetInputText(compositeDoc);
-	    	String res=compositeDoc.classifier_input;
+	    	ClassifierInputTarget inputAdapter = new ClassifierInputAllNLPAdapter();
+	    	String res = inputAdapter.GetInputText(compositeDoc);
+			String restext = replaceSpecStr(res);
+			
+			StringBuilder sb = new StringBuilder();
+			String[] wordlist = null;
+			wordlist = restext.split(" ");
+			DocProcessUtil.Stopword stopWord = new DocProcessUtil.Stopword() ;
+			for(String word:wordlist){
+			if(stopWord.IsStopWord(word)){
+				sb.append("");
+			}else
+				sb.append(word).append(" ");
+			} 
+			String text = sb.toString();
 //	    	String label = prefixMatch.GetMatchedPatternLabel(compositeDoc.doc_url);
 	    	String label = null;
-	    	 if ((compositeDoc.media_doc_info.normalized_category_info != null) && 
-	    		        (compositeDoc.media_doc_info.normalized_category_info.category_item != null) && 
-	    		        (compositeDoc.media_doc_info.normalized_category_info.category_item.size() != 0)&&
-	    		        compositeDoc.media_doc_info.normalized_category_info.category_item.get(0).category_path !=null &&
-			    		compositeDoc.media_doc_info.normalized_category_info.category_item.get(0).category_path.size() >=2)
-	    		      {
-	    		        label = compositeDoc.media_doc_info.normalized_category_info.category_item.get(0).category_path.get(0);
-	    		        context.getCounter("custom", "Matched").increment(1);
-	    		      } else {
-	    		        label = "Nomatch";
-	    		        context.getCounter("custom", "NoMatch").increment(1);
-	    		      }
-	    	context.write(new Text(compositeDoc.doc_url), new Text(compositeDoc.doc_id+"\t"+label + "\t" + res));
+	    	 if (    compositeDoc.media_doc_info.normalized_category_info != null && 
+			    		compositeDoc.media_doc_info.normalized_category_info.category_item != null &&
+			    		compositeDoc.media_doc_info.normalized_category_info.category_item.size() != 0 &&
+			    		compositeDoc.media_doc_info.normalized_category_info.category_item.get(0).category_path !=null &&
+			    		compositeDoc.media_doc_info.normalized_category_info.category_item.get(0).category_path.size() >=2){
+	    	label = compositeDoc.media_doc_info.normalized_category_info.category_item.get(0).category_path.get(1);
+	    		context.getCounter("custom", "Get prefix label").increment(1);;
+	    	} else {
+	    		label = "NoMatch";
+	    		context.getCounter("custom", "Empty label").increment(1);;
+	    	}
+	    	context.write(new Text(compositeDoc.doc_url), new Text(compositeDoc.media_doc_info.id+"\t"+label + "\t" + text));
+		
 		}
-	}  
+    }
     
+	public static String replaceSpecStr(String orgStr){  
+	    if (null!=orgStr&&!"".equals(orgStr.trim())) {  
+	        String regEx="[~¡¤`!£¡@#£¤$%^¡­¡­&*£¨()£©\\¡ª¡ª\\=+¡¾\\[\\]¡¿£û{}£ý\\|¡¢\\\\£»;£º:¡®'¡°¡±\"£¬,¡¶<¡£.¡·>¡¢/£¿?^[0-9]]";  
+	        Pattern p = Pattern.compile(regEx);  
+	        Matcher m = p.matcher(orgStr);  
+	        return m.replaceAll(" ");  
+	    }  
+	    return null;  
+	}
     public static void main(String[] args) throws Exception
     {
     	Configuration conf = new Configuration();
@@ -100,10 +133,10 @@ public class ClassificationTrainingDataNoMatchMR {
     }
     
 	/**
-	 * ÎªMapreduceï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½jarï¿½ï¿½
+	 * ÎªMapreduceÌí¼ÓµÚÈý·½jar°ü
 	 * 
 	 * @param jarPath
-	 *            ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½D:/Java/new_java_workspace/scm/lib/guava-r08.jar
+	 *            ¾ÙÀý£ºD:/Java/new_java_workspace/scm/lib/guava-r08.jar
 	 * @param conf
 	 * @throws IOException
 	 */
