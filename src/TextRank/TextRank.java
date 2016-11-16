@@ -25,42 +25,7 @@ import java.util.zip.GZIPInputStream;
 
 public class TextRank
 {
-	public static Set<String> stopWords=new HashSet<String>();
-	public static Set<String> Load(InputStream input) throws IOException {
-
-		Set<String> result=new HashSet<String>();
-		BufferedReader br=new BufferedReader(new InputStreamReader(input));
-		String line;
-		while((line=br.readLine())!=null) {
-			if (line.isEmpty()) {
-				continue;
-			}
-			stopWords.add(line);
-
-		}	
-		return result;
-	}
-	public static void loadStopWords(String path) throws IOException{
-		/*File f=new File(path);
-		if(f.exists()){
-			System.out.println("a");
-		}*/
-
-		InputStream is = new Object().getClass().getClassLoader().getResourceAsStream(path);
-		//InputStream is =new FileInputStream(f);
-		if (is == null) {
-			throw new IOException();
-		}
-		try {
-			if (path.endsWith(".gz"))
-				is = new GZIPInputStream(new BufferedInputStream(is));
-			else
-				is = new BufferedInputStream(is);
-		} catch (IOException e) {
-			System.err.println("CLASSPATH resource " + path + " is not a GZIP stream!");
-		}
-		TextRank.stopWords.addAll(Load(is));
-	}
+	 
 
 	//	static{
 	//		try {
@@ -95,7 +60,7 @@ public class TextRank
 		{
 			line = line.trim();
 			if (line.length() == 0) continue;
-			for (String sent : line.split("[锟�锟�:锛氾拷?鈥濓紵?锟�锟�]"))
+			for (String sent : line.split("[,.;!?]"))
 			{
 				sent = sent.trim();
 				if (sent.length() == 0) continue;
@@ -123,7 +88,7 @@ public class TextRank
 	public static String modifyWord(String word){
 		// word="'the";
 		word=word.replaceAll("'s$", "");
-		String regEx="[\"`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~锛丂#锟�鈥︼拷?&*锛堬級鈥旓拷?+|{}銆愶拷?鈥橈紱锛氾拷?鈥滐拷?銆傦紝銆侊紵]";
+		String regEx="[\"`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
 		word=word.replaceAll(regEx, "");
 		return word.toLowerCase();
 

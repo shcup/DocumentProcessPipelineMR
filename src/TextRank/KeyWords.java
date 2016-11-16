@@ -38,8 +38,9 @@ public class  KeyWords{
 	}
 	public static void main(String[] args) throws IOException
 	{
-		//List<String> document = FileUtils.readLines(new File("text"));
-		//KeyWords keywords=KeyWords.getKeyWords(document, 10);
+		String line="afasf,asfadf.asfdasf?asfadfd";
+		String[] ss=line.split("[,.;!?]");
+		System.out.println("a");
 
 	}
 
