@@ -87,31 +87,10 @@ public class DocumentProcess {
 		    	context.getCounter("custom", "Too long text").increment(1);;
 		    }
 		    
-	    	String label = prefixMatch.GetMatchedPatternLabel(compositeDoc.doc_url);
+
 	    	ClassifierInputTarget inputAdapter = new ClassifierInputAllNLPAdapter();
 	    	String res = inputAdapter.GetInputText(compositeDoc);
 	    	compositeDoc.classifier_input = res;
-	    	if (label != null && !label.isEmpty()) {
-	    		context.getCounter("custom", "Get prefix label").increment(1);;
-	    	} else {
-	    		context.getCounter("custom", "Empty label").increment(1);;
-	    	}		    
-	    	if (label != null) {
-	    		if (compositeDoc.media_doc_info.normalized_category_info == null) {
-	    			compositeDoc.media_doc_info.normalized_category_info = new pipeline.basictypes.CategoryInfo();
-	    		}
-	    		CategoryItem categoryItem = new CategoryItem();
-	    		categoryItem.category_path = new ArrayList<String>();
-	    		String[] full_category = label.split(":");
-	    		for (int i = 0; i < full_category.length; ++i) {
-	    			categoryItem.category_path.add(full_category[i]);
-	    		}
-	    		
-	    		if (compositeDoc.media_doc_info.normalized_category_info.category_item == null) {
-	    			compositeDoc.media_doc_info.normalized_category_info.category_item = new ArrayList<pipeline.basictypes.CategoryItem>();
-	    		}
-	    		compositeDoc.media_doc_info.normalized_category_info.category_item.add(categoryItem);	   			    		
-	    	}
 		    
 		    context.write(new Text(segments[0]), new Text(CompositeDocSerialize.Serialize(compositeDoc, context)));
 

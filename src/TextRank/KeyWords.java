@@ -22,9 +22,9 @@ public class  KeyWords{
 		List<ItemFeature> result=new ArrayList<ItemFeature>();
 		for(Entry<String,Float> e:keyWords){
 			ItemFeature itemFeature=new ItemFeature();
-			itemFeature.name=e.getKey();
-			itemFeature.weight=(short) (e.getValue()*100);
-			itemFeature.type = type;
+			itemFeature.setName(e.getKey());
+			itemFeature.setWeight((short) (e.getValue()*100));
+			itemFeature.setType(type);
 			result.add(itemFeature);
 		}
 		return result;
