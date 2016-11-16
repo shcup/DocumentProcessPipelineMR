@@ -1,31 +1,22 @@
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.zip.GZIPInputStream;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import DocProcess.CompositeDocSerialize;
-import DocProcessClassification.DataAdapter.ClassifierInputAllNLPAdapter;
-import DocProcessClassification.DataAdapter.ClassifierInputTarget;
-import DocProcessClassification.PatternMatch.URLPrefixPatternMatch;
 import pipeline.CompositeDoc;
 
 public class InvertIndexBuilderMapReduce {
@@ -181,10 +172,10 @@ public class InvertIndexBuilderMapReduce {
     }
     
 	/**
-	 * ÎªMapreduceÌí¼ÓµÚÈý·½jar°ü
+	 * ÎªMapreduceï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½jarï¿½ï¿½
 	 * 
 	 * @param jarPath
-	 *            ¾ÙÀý£ºD:/Java/new_java_workspace/scm/lib/guava-r08.jar
+	 *            ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½D:/Java/new_java_workspace/scm/lib/guava-r08.jar
 	 * @param conf
 	 * @throws IOException
 	 */

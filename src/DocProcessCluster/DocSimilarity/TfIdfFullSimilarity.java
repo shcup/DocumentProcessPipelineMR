@@ -1,10 +1,8 @@
 package DocProcessCluster.DocSimilarity;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,22 +19,23 @@ public class TfIdfFullSimilarity implements ICompositeDocSimilarityGenerator {
 		idfTable = new HashMap<String, Double>();
 	}
 	public void Load(String file) throws NumberFormatException, IOException {
-		BufferedReader br=new BufferedReader(new FileReader(file));
-        String line;
-        boolean first = true;
-        while((line=br.readLine())!=null) {
-        	if (first) {
-        		totalDoc = Integer.valueOf(line);
-        		first = false;
-        	}
-        	String[] items = line.split("\t");
-        	if (items.length != 2) {
-        		System.exit(-1);
-        	}
-        	Integer df = Integer.valueOf(items[1]);
-        	
-        	idfTable.put(items[0], Math.log((double)(totalDoc) / df));
-        }
+		try(BufferedReader br=new BufferedReader(new FileReader(file))){
+			String line;
+	        boolean first = true;
+	        while((line=br.readLine())!=null) {
+	        	if (first) {
+	        		totalDoc = Integer.valueOf(line);
+	        		first = false;
+	        	}
+	        	String[] items = line.split("\t");
+	        	if (items.length != 2) {
+	        		System.exit(-1);
+	        	}
+	        	Integer df = Integer.valueOf(items[1]);
+	        	
+	        	idfTable.put(items[0], Math.log((double)(totalDoc) / df));
+	        }
+		}
 	}
 	@Override
 	public double Get(CompositeDoc doc1, CompositeDoc doc2) {

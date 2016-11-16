@@ -94,7 +94,7 @@ public class CompositeDocNLPProcess {
 			if (inbody == true && body != null) {
 				body.add(item.getKey().toLowerCase());
 			}
-			weight.add(new Pair(item.getKey(), feature_score));
+			weight.add(new Pair<String, Double>(item.getKey(), feature_score));
 		}
 		
 

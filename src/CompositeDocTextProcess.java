@@ -1,31 +1,15 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
-import java.util.Scanner;
 import java.util.Map.Entry;
+import java.util.Properties;
 
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper.Context;
-
-import TextRank.KeyWords;
-import TextRank.TextRank;
-
-import DocProcess.CompositeDocSerialize;
 import DocProcess.IDocProcessor;
 import DocProcessUtil.Stopword;
+import TextRank.KeyWords;
 import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
@@ -40,7 +24,6 @@ import edu.stanford.nlp.process.DocumentPreprocessor;
 import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.process.Tokenizer;
 import edu.stanford.nlp.process.TokenizerFactory;
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
@@ -575,7 +558,7 @@ public class CompositeDocTextProcess implements IDocProcessor {
 		return  false;
 	}
     
-    public static void main(String[] args) throws Exception 
+    /*public static void main(String[] args) throws Exception 
     {
     	TextRank.loadStopWords("stopWords.txt");
     	CompositeDocTextProcess textProcess = new CompositeDocTextProcess();
@@ -650,5 +633,5 @@ public class CompositeDocTextProcess implements IDocProcessor {
     	}
     	br.close();;
 
-    }
+    }*/
 }

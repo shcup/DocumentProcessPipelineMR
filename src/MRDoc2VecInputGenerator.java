@@ -8,7 +8,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
@@ -82,10 +81,10 @@ public class MRDoc2VecInputGenerator {
     }
     
 	/**
-	 * ÎªMapreduceÌí¼ÓµÚÈý·½jar°ü
+	 * ÎªMapreduceï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½jarï¿½ï¿½
 	 * 
 	 * @param jarPath
-	 *            ¾ÙÀý£ºD:/Java/new_java_workspace/scm/lib/guava-r08.jar
+	 *            ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½D:/Java/new_java_workspace/scm/lib/guava-r08.jar
 	 * @param conf
 	 * @throws IOException
 	 */

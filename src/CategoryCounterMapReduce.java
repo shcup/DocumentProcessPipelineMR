@@ -1,36 +1,18 @@
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.codec.binary.Base64;
-
-import java.io.IOException;
-import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.GenericOptionsParser;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.transport.TMemoryBuffer;
-//import org.apache.commons.cli.Options;
 
 import DocProcess.CompositeDocSerialize;
-import leso.media.ImageTextDoc;
 import pipeline.CompositeDoc;
-import pipeline.basictypes.CategoryItem;
 
 // this maprecude program is based on hadoop 2.6, the low version is not supported
 public class CategoryCounterMapReduce {
@@ -114,10 +96,10 @@ public class CategoryCounterMapReduce {
     }
     
 	/**
-	 * ÎªMapreduceÌí¼ÓµÚÈý·½jar°ü
+	 * ÎªMapreduceï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½jarï¿½ï¿½
 	 * 
 	 * @param jarPath
-	 *            ¾ÙÀý£ºD:/Java/new_java_workspace/scm/lib/guava-r08.jar
+	 *            ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½D:/Java/new_java_workspace/scm/lib/guava-r08.jar
 	 * @param conf
 	 * @throws IOException
 	 */
