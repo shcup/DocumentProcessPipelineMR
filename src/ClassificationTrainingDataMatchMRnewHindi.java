@@ -1,50 +1,43 @@
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import DocProcess.CompositeDocSerialize;
+import DocProcess.IDF.IDFGenerator;
 import DocProcessClassification.DataAdapter.ClassifierInputAllNLPAdapter;
+import DocProcessClassification.DataAdapter.ClassifierInputAllNLP_Adapter;
 import DocProcessClassification.DataAdapter.ClassifierInputTarget;
 import DocProcessClassification.PatternMatch.URLPrefixPatternMatch;
 import pipeline.CompositeDoc;
-import pipeline.basictypes.CategoryItem;
+import DocProcessUtil.Stopword;
 
-// this maprecude program is based on hadoop 2.6, the low version is not supported
-public class DocumentProcessHindi {
-
-	
+public class ClassificationTrainingDataMatchMRnewHindi {
     public static class Map extends  Mapper<Object, Text, Text, Text>
     {
-
-		private Text word = new Text();
-		private CompositeDocTextProcessHindi textProcess;
-		URLPrefixPatternMatch prefixMatch = null;
-		
-		@Override
-		public void setup(org.apache.hadoop.mapreduce.Mapper.Context context) throws IOException, InterruptedException {
-			System.out.println("begin to setup function!");
-			try {
-				textProcess = new CompositeDocTextProcessHindi();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
+    	/*URLPrefixPatternMatch prefixMatch = null;
+    	public void setup(org.apache.hadoop.mapreduce.Mapper.Context context) throws IOException, InterruptedException {
     		prefixMatch = new URLPrefixPatternMatch();
     		
-    		String path = "pattern_hindi.txt";
+    		String path = "pattern.txt";
     	    InputStream is = getClass().getClassLoader().getResourceAsStream(path);
     	    if (is == null) {
     	    	throw new IOException();
@@ -59,13 +52,12 @@ public class DocumentProcessHindi {
     	    }
     		
     		prefixMatch.Load(is);
-		}
-
-		@Override
+    	}*/
+    	
 		public void map(Object key, Text value, Context context)
 				throws IOException, InterruptedException
 		{
-			//System.out.println("begin to mapper");
+			System.out.println("begin to mapper");
 		    String line = value.toString();
 		    String[] segments = line.split("\t");
 		    if (segments.length != 2) {
@@ -75,78 +67,60 @@ public class DocumentProcessHindi {
 		    
 		    CompositeDoc compositeDoc = CompositeDocSerialize.DeSerialize(segments[1], context);
 		    
-		    int res_status;
-		    System.out.println("textProcess is " + textProcess);
-		    System.out.println("compositeDoc is " + compositeDoc);
-		    res_status = textProcess.Process(compositeDoc);
-		    if ((res_status & 2) != 0) {
-		    	//System.out.println("Doc url " + compositeDoc.doc_url);
-		    	context.getCounter("custom", "Too long text").increment(1);;
-		    }
-		    
-	    	String label = prefixMatch.GetMatchedPatternLabel(compositeDoc.doc_url);
 	    	ClassifierInputTarget inputAdapter = new ClassifierInputAllNLPAdapter();
 	    	String res = inputAdapter.GetInputText(compositeDoc);
-	    	compositeDoc.classifier_input = res;
-	    	if (label != null && !label.isEmpty()) {
+			//String restext = replaceSpecStr(res);
+			
+			StringBuilder sb = new StringBuilder();
+			String[] wordlist = null;
+			//wordlist = restext.split(" ");
+			wordlist = res.split(" ");
+			DocProcessUtil.StopwordHindi stopWord = new DocProcessUtil.StopwordHindi() ;
+			for(String word:wordlist){
+			if(stopWord.IsStopWord(word)){
+				sb.append("");
+			}else
+				sb.append(word).append(" ");
+			} 
+			String text = sb.toString();
+//	    	String label = prefixMatch.GetMatchedPatternLabel(compositeDoc.doc_url);
+	    	String label = null;
+	    	 if (    compositeDoc.media_doc_info.normalized_category_info != null && 
+			    		compositeDoc.media_doc_info.normalized_category_info.category_item != null &&
+			    		compositeDoc.media_doc_info.normalized_category_info.category_item.size() != 0 &&
+			    		compositeDoc.media_doc_info.normalized_category_info.category_item.get(0).category_path !=null &&
+			    		compositeDoc.media_doc_info.normalized_category_info.category_item.get(0).category_path.size() !=0){
+	    	label = compositeDoc.media_doc_info.normalized_category_info.category_item.get(0).category_path.get(0);
 	    		context.getCounter("custom", "Get prefix label").increment(1);;
 	    	} else {
+	    		label = "NoMatch";
 	    		context.getCounter("custom", "Empty label").increment(1);;
-	    	}		    
-	    	if (label != null) {
-	    		if (compositeDoc.media_doc_info.normalized_category_info == null) {
-	    			compositeDoc.media_doc_info.normalized_category_info = new pipeline.basictypes.CategoryInfo();
-	    		}
-	    		CategoryItem categoryItem = new CategoryItem();
-	    		categoryItem.category_path = new ArrayList<String>();
-	    		String[] full_category = label.split(":");
-	    		for (int i = 0; i < full_category.length; ++i) {
-	    			categoryItem.category_path.add(full_category[i]);
-	    		}
-	    		
-	    		if (compositeDoc.media_doc_info.normalized_category_info.category_item == null) {
-	    			compositeDoc.media_doc_info.normalized_category_info.category_item = new ArrayList<pipeline.basictypes.CategoryItem>();
-	    		}
-	    		compositeDoc.media_doc_info.normalized_category_info.category_item.add(categoryItem);	   			    		
 	    	}
-		    
-		    context.write(new Text(segments[0]), new Text(CompositeDocSerialize.Serialize(compositeDoc, context)));
-
+	    	context.write(new Text(compositeDoc.doc_url), new Text(compositeDoc.media_doc_info.id+"\t"+label + "\t" + text));
+		
 		}
     }
-	public static class Reduce extends Reducer<Text, Text, Text, Text>
-	{
-		@Override
-		public void reduce(Text key, Iterable<Text> values,Context context)
-				throws IOException, InterruptedException
-		{
-			for (Text text : values) {
-				context.write(key, text);
-			}
-		}
-	}
+    
+	/*public static String replaceSpecStr(String orgStr){  
+	    if (null!=orgStr&&!"".equals(orgStr.trim())) {  
+	        String regEx="[~��`!��@#��$%^����&*��()��\\����\\=+��\\[\\]����{}��\\|��\\\\��;��:��'����\"��,��<��.��>��/��?^[0-9]]";  
+	        Pattern p = Pattern.compile(regEx);  
+	        Matcher m = p.matcher(orgStr);  
+	        return m.replaceAll(" ");  
+	    }  
+	    return null;  
+	}*/
     public static void main(String[] args) throws Exception
     {
     	Configuration conf = new Configuration();
-    	
-    	conf.set("type", "classifier_data");
-    	conf.set("mapreduce.map.memory.mb", "5000");
-    	conf.set("mapreduce.map.java.opts", "-Xmx4608m");
-    	
-    	/*String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-    	if (otherArgs.length != 2) {
-    		System.err.println("Usage: wordcount <in> <out>");
-    		System.exit(2);
-    	}*/
+
         String[] libjarsArr = args[2].split(",");
         for (int i = 0; i < libjarsArr.length; ++i) {
         	addTmpJar(libjarsArr[i], conf);
         }
-    	Job job = new Job(conf, "Stanford NLP process");
-    	job.setJarByClass(DocumentProcessHindi.class);
+    	Job job =  Job.getInstance(conf, "Classification training");
+    	job.setJarByClass(ClassificationTrainingDataMatchMRnewHindi.class);
     	job.setMapperClass(Map.class);
-    	//job.setCombinerClass(Reduce.class);
-    	job.setReducerClass(Reduce.class);
     	job.setNumReduceTasks(0);
     	job.setOutputKeyClass(Text.class);
     	job.setOutputValueClass(Text.class);
@@ -178,5 +152,4 @@ public class DocumentProcessHindi {
 			conf.set("tmpjars", tmpjars + "," + newJarPath);
 		}
 	}
-
 }
