@@ -1,10 +1,7 @@
 package DocProcessClassification.DataAdapter;
-
 import pipeline.CompositeDoc;
 import shared.datatypes.ItemFeature;
-
-public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
-
+public class ClassifierNormalizedRichFeatureAdapter implements ClassifierInputTarget {
 	@Override
 	public String GetInputText(CompositeDoc compositeDoc) {
 		// TODO Auto-generate method stub
@@ -15,7 +12,6 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 				compositeDoc.category_info.category_item != null &&
 				compositeDoc.category_info.category_item.get(0).category_path !=null ) {
 			String s=compositeDoc.category_info.category_item.get(0).getCategory_path().toString();
-//		    sb.append(compositeDoc.category_info.category_item.get(0).getCategory_path());
 		    sb.append(s);
 			sb.append(' ');
 		} else {
@@ -24,14 +20,12 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 		
 		if (compositeDoc.bread_crumbs != null) {
 			for (String word : compositeDoc.bread_crumbs) {
-//				sb.append("");
 				sb.append(word);
 				sb.append(' ');
 			}
 		}
 		if (compositeDoc.title_words != null) {
 			for (String word : compositeDoc.title_words) {
-//				sb.append("");
 				sb.append(word.replace(" ","_"));
 				sb.append(' ');
 			}
@@ -47,7 +41,6 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 		if (compositeDoc.title_2grams != null) {
 			for (String word : compositeDoc.title_2grams) {
 				sb.append(word.replace(" ","_"));
-//				sb.append(word);
 				sb.append(' ');
 			}			
 		}
@@ -55,7 +48,6 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 		if (compositeDoc.body_2grams != null) {
 			for (String word : compositeDoc.body_2grams) {
 				sb.append(word.replace(" ","_"));
-//				sb.append(word);
 				sb.append(' ');
 			}
 		}
@@ -64,41 +56,39 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 		if (compositeDoc.title_nnp != null) {
 			for (String word : compositeDoc.title_nnp) {
 				sb.append(word.replace(" ","_"));
-//				sb.append(word);
 				sb.append(' ');
 			}
 		}
 		if (compositeDoc.body_nnp != null) {
 			for (String word : compositeDoc.body_nnp) {
 				sb.append(word.replace(" ","_"));
-//				sb.append(word);
 				sb.append(' ');
 			}
 		}
-		if (compositeDoc.title_NER_person != null) {
-			for (String word : compositeDoc.title_NER_person) {
-//				sb.append("_");
-//				sb.append(word);
+		
+		if (compositeDoc.title_ner != null) {
+			for (String word : compositeDoc.title_ner) {
 				sb.append(word.replace(" ","_"));
-				sb.append(' ');
-			}			
+				sb.append(' ');				
+			}
 		}
-
-		if (compositeDoc.title_NER_location != null) {
-			for (String word : compositeDoc.title_NER_location) {
-//				sb.append("_");
-//				sb.append(word);
+		if (compositeDoc.body_ner != null) {
+			for (String word : compositeDoc.body_ner) {
 				sb.append(word.replace(" ","_"));
 				sb.append(' ');
 			}
 		}
-		if (compositeDoc.title_NER_organization != null) {
-			for (String word : compositeDoc.title_NER_organization) {
-//				sb.append("_");
-//				sb.append(word);
+		if (compositeDoc.title_np != null) {
+			for (String word : compositeDoc.title_np) {
 				sb.append(word.replace(" ","_"));
 				sb.append(' ');
-			}			
+			}
+		}
+		if (compositeDoc.body_np != null) {
+			for (String word : compositeDoc.body_np) {
+				sb.append(word.replace(" ","_"));
+				sb.append(' ');
+			}
 		}
 		
 		if(compositeDoc.text_rank !=null){
@@ -117,7 +107,4 @@ public class ClassifierInputAllNLPAdapter implements ClassifierInputTarget {
 		
 		return sb.toString();
 	}
-	
-	
-
 }
